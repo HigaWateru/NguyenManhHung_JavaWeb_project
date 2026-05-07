@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Trang chủ Bệnh nhân')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="main-content container mt-4">
+        <!-- Hero Section -->
+        <div class="p-5 mb-4 bg-primary text-white rounded-3 shadow">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold">Chăm sóc sức khỏe thông minh</h1>
+                <p class="col-md-8 fs-4">Đặt lịch khám nhanh chóng, quản lý hồ sơ bệnh án điện tử và kết nối với các bác sĩ hàng đầu ngay tại nhà.</p>
+                <a th:href="${session.loginUser != null ? '/patient/appointment' : '/login'}" class="btn btn-light btn-lg px-4 fw-bold text-primary">Đặt lịch ngay <i class="fas fa-calendar-plus ms-2"></i></a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Feature Cards -->
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-3">
+                    <div class="card-body">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-calendar-check fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Đặt lịch khám</h5>
+                        <p class="card-text text-muted">Chủ động chọn bác sĩ và thời gian khám phù hợp với lịch trình của bạn.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-3">
+                    <div class="card-body">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-file-medical fa-2x text-success"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Hồ sơ bệnh án</h5>
+                        <p class="card-text text-muted">Xem lại lịch sử khám bệnh, kết quả chẩn đoán và đơn thuốc bất cứ lúc nào.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-3">
+                    <div class="card-body">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-user-md fa-2x text-info"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Bác sĩ chuyên khoa</h5>
+                        <p class="card-text text-muted">Đội ngũ bác sĩ giàu kinh nghiệm từ nhiều chuyên khoa khác nhau.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section for Logged In User -->
+        <div class="mt-5" th:if="${session.loginUser != null}">
+            <h3 class="fw-bold mb-4">Lịch hẹn gần đây</h3>
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Ngày khám</th>
+                                    <th>Bác sĩ</th>
+                                    <th>Chuyên khoa</th>
+                                    <th>Trạng thái</th>
+                                    <th class="text-end pe-4">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">Bạn chưa có lịch hẹn nào. <a href="#">Đặt lịch ngay!</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}" style="position: fixed; bottom: 0"></footer>
+</body>
+</html>

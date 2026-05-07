@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Hồ sơ cá nhân')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 p-0">
+                <div th:replace="~{fragments/layout :: sidebar('profile')}"></div>
+            </div>
+            <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Hồ sơ cá nhân</h1>
+                </div>
+
+                <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    Cập nhật hồ sơ thành công!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card mb-4 text-center">
+                            <div class="card-body">
+                                <img th:src="${profile.photo != null ? profile.photo : 'https://via.placeholder.com/150'}" 
+                                     alt="Avatar" class="rounded-circle img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                                <h5 class="card-title" th:text="${profile.fullName != null ? profile.fullName : user.username}">Username</h5>
+                                <p class="text-muted" th:text="${user.role}">Role</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">Thông tin chi tiết</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/profile/update}" method="post" enctype="multipart/form-data">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Họ và tên</label>
+                                            <input type="text" name="fullName" class="form-control" th:value="${profile.fullName}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Số điện thoại</label>
+                                            <input type="text" name="phone" class="form-control" th:value="${profile.phone}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Ngày sinh</label>
+                                            <input type="date" name="dob" class="form-control" th:value="${profile.dob}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Giới tính</label>
+                                            <select name="gender" class="form-select">
+                                                <option value="Nam" th:selected="${profile.gender == 'Nam'}">Nam</option>
+                                                <option value="Nữ" th:selected="${profile.gender == 'Nữ'}">Nữ</option>
+                                                <option value="Khác" th:selected="${profile.gender == 'Khác'}">Khác</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Địa chỉ</label>
+                                            <input type="text" name="address" class="form-control" th:value="${profile.address}">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Ảnh đại diện</label>
+                                            <input type="file" name="image" class="form-control" accept="image/*">
+                                        </div>
+
+                                        <!-- Doctor specific fields -->
+                                        <div th:if="${user.role.name() == 'DOCTOR'}" class="mt-4 border-top pt-3">
+                                            <h6 class="mb-3">Thông tin chuyên môn</h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">Mô tả bản thân</label>
+                                                <textarea name="description" class="form-control" rows="4" th:text="${doctor != null ? doctor.description : ''}"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Chuyên khoa</label>
+                                                <select name="specialtyId" class="form-select">
+                                                    <option th:each="s : ${specialties}" th:value="${s.id}" 
+                                                            th:text="${s.name}" 
+                                                            th:selected="${doctor != null and doctor.specialty != null and doctor.specialty.id == s.id}">
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 mt-4">
+                                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

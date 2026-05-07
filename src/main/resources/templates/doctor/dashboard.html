@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Bác sĩ Dashboard')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="main-content container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div th:replace="~{fragments/layout :: sidebar('dashboard')}"></div>
+            </div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2 fw-bold">Danh sách bệnh nhân chờ khám</h1>
+                    <div class="text-muted">Hôm nay: <span class="fw-bold" th:text="${#calendars.format(#calendars.createNow(), 'dd/MM/yyyy')}"></span></div>
+                </div>
+
+                <!-- Stats Summary -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-start border-primary border-4 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted small text-uppercase">Chờ khám</h6>
+                                        <h3 class="fw-bold mb-0 text-primary">05</h3>
+                                    </div>
+                                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                                        <i class="fas fa-user-clock text-primary fa-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-start border-success border-4 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted small text-uppercase">Đã khám xong</h6>
+                                        <h3 class="fw-bold mb-0 text-success">12</h3>
+                                    </div>
+                                    <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                                        <i class="fas fa-user-check text-success fa-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-start border-info border-4 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted small text-uppercase">Tổng ca khám</h6>
+                                        <h3 class="fw-bold mb-0 text-info">17</h3>
+                                    </div>
+                                    <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                                        <i class="fas fa-users text-info fa-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointment List -->
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">STT</th>
+                                        <th>Bệnh nhân</th>
+                                        <th>Thời gian</th>
+                                        <th>Lý do khám</th>
+                                        <th>Trạng thái</th>
+                                        <th class="text-end pe-4">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="ps-4">1</td>
+                                        <td>
+                                            <div class="fw-bold">Lê Văn C</div>
+                                            <small class="text-muted">Nam, 28 tuổi</small>
+                                        </td>
+                                        <td>08:30 - 09:00</td>
+                                        <td>Đau họng, sốt nhẹ</td>
+                                        <td><span class="badge bg-primary">Đang chờ</span></td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-success px-3">Bắt đầu khám <i class="fas fa-arrow-right ms-1"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted small">
+                                            Dữ liệu mẫu - Sẽ hiển thị thực tế từ danh sách đặt lịch (Appointments).
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}" style="position: fixed; bottom: 0"></footer>
+</body>
+</html>

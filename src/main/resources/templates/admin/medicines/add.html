@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Thêm thuốc mới')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="main-content container-fluid">
+        <div class="row">
+            <div class="col-md-3 col-lg-2 px-0">
+                <div th:replace="~{fragments/layout :: sidebar('medicines')}"></div>
+            </div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/medicines}">Quản lý thuốc</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Thêm thuốc mới</li>
+                    </ol>
+                </nav>
+
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0 fw-bold">Thông tin thuốc mới</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form th:action="@{/admin/medicines/add}" th:object="${medicine}" method="post">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Tên thuốc</label>
+                                    <input type="text" class="form-control" th:field="*{name}" placeholder="VD: Paracetamol 500mg" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Đơn vị tính</label>
+                                    <input type="text" class="form-control" th:field="*{unit}" placeholder="VD: Viên, Vỉ, Tuýp" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Giá bán (VNĐ)</label>
+                                    <input type="number" class="form-control" th:field="*{price}" placeholder="0" required min="0">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Số lượng tồn kho</label>
+                                    <input type="number" class="form-control" th:field="*{stock}" placeholder="0" required min="0">
+                                </div>
+                            </div>
+                            <div class="mt-4 border-top pt-4 text-end">
+                                <a th:href="@{/admin/medicines}" class="btn btn-light px-4 me-2">Hủy</a>
+                                <button type="submit" class="btn btn-primary px-5 shadow-sm">Lưu thông tin</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

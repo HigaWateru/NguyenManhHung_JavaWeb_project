@@ -1,12 +1,10 @@
 package demo.project.running;
 
-import demo.project.model.Doctor;
-import demo.project.model.Medicine;
-import demo.project.model.Specialty;
-import demo.project.model.User;
+import demo.project.model.*;
 import demo.project.model._enum.Role;
 import demo.project.repository.DoctorRepository;
 import demo.project.repository.MedicineRepository;
+import demo.project.repository.ProfileRepository;
 import demo.project.repository.SpecialtyRepository;
 import demo.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +23,7 @@ public class DataInitializer implements CommandLineRunner {
     private final SpecialtyRepository specialtyRepository;
     private final MedicineRepository medicineRepository;
     private final DoctorRepository doctorRepository;
+    private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -62,56 +61,48 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private Medicine createMedicine(String name, Integer stock, Double price, String unit) {
-        Medicine m = new Medicine();
-        m.setName(name);
-        m.setStock(stock);
-        m.setPrice(price);
-        m.setUnit(unit);
+        Medicine m = Medicine.builder().name(name).stock(stock).price(price).unit(unit).build();
         return m;
     }
 
     private void initializeUsers() {
         // Tạo Admin
         if (userRepository.findByUsername("admin") == null) {
-            User admin = User.builder()
-                    .username("admin")
-                    .password(passwordEncoder.encode("123456"))
-                    .role(Role.ADMIN)
-                    .isActive(true)
-                    .build();
+            User admin = User.builder().username("admin").password(passwordEncoder.encode("123456"))
+                    .role(Role.ADMIN).isActive(true).build();
             userRepository.save(admin);
+
+            Profile adminProfile = Profile.builder().user(admin).fullName("Quản trị viên Hệ thống").phone("0123456789")
+                    .build();
+            profileRepository.save(adminProfile);
             System.out.println("Đã tạo tài khoản admin mẫu: admin/123456");
         }
 
         // Tạo Doctor
         if (userRepository.findByUsername("doctor") == null) {
-            User doctorUser = User.builder()
-                    .username("doctor")
-                    .password(passwordEncoder.encode("123456"))
-                    .role(Role.DOCTOR)
-                    .isActive(true)
-                    .build();
+            User doctorUser = User.builder().username("doctor").password(passwordEncoder.encode("123456"))
+                    .role(Role.DOCTOR).isActive(true).build();
             userRepository.save(doctorUser);
 
-            // Tạo thông tin Doctor chi tiết
-            Specialty specialty = specialtyRepository.findAll().get(0); // Lấy chuyên khoa đầu tiên
-            Doctor doctor = new Doctor();
-            doctor.setUser(doctorUser);
-            doctor.setSpecialty(specialty);
-            doctor.setDescription("Bác sĩ chuyên khoa đầu ngành");
+            Profile doctorProfile = Profile.builder().user(doctorUser).fullName("Bác sĩ Nguyễn Văn A")
+                    .phone("0987654321").build();
+            profileRepository.save(doctorProfile);
+
+            Specialty specialty = specialtyRepository.findAll().get(0);
+            Doctor doctor = Doctor.builder().user(doctorUser).specialty(specialty).description("Bác sĩ chuyên khoa đầu ngành").build();
             doctorRepository.save(doctor);
             System.out.println("Đã tạo tài khoản bác sĩ mẫu: doctor/123456");
         }
 
         // Tạo Patient
         if (userRepository.findByUsername("patient") == null) {
-            User patient = User.builder()
-                    .username("patient")
-                    .password(passwordEncoder.encode("123456"))
-                    .role(Role.PATIENT)
-                    .isActive(true)
-                    .build();
+            User patient = User.builder().username("patient").password(passwordEncoder.encode("123456"))
+                    .role(Role.PATIENT).isActive(true).build();
             userRepository.save(patient);
+
+            Profile patientProfile = Profile.builder().user(patient).fullName("Bệnh nhân Nguyễn Văn B")
+                    .phone("0333444555").build();
+            profileRepository.save(patientProfile);
             System.out.println("Đã tạo tài khoản bệnh nhân mẫu: patient/123456");
         }
     }

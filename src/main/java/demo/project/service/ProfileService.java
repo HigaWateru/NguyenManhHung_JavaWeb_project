@@ -53,9 +53,7 @@ public class ProfileService {
                 doctor.setDescription(description);
                 if (specialtyId != null) {
                     Specialty specialty = specialtyRepository.findById(specialtyId).orElse(null);
-                    if (specialty != null) {
-                        doctor.setSpecialty(specialty);
-                    }
+                    if (specialty != null) doctor.setSpecialty(specialty);
                 }
                 doctorRepository.save(doctor);
             }

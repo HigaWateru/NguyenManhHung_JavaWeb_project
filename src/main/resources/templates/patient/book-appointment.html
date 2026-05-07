@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Đặt lịch khám')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="main-content container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h4 class="mb-0 fw-bold"><i class="fas fa-calendar-plus me-2"></i> Đăng ký lịch khám</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form th:action="@{/patient/appointments/book}" th:object="${appointmentForm}" method="post">
+                            
+                            <!-- Chuyên khoa -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">1. Chọn Chuyên khoa</label>
+                                <select id="specialtySelect" class="form-select" th:field="*{specialtyId}">
+                                    <option value="" selected>-- Chọn chuyên khoa --</option>
+                                    <option th:each="s : ${specialties}" th:value="${s.id}" th:text="${s.name}"></option>
+                                </select>
+                                <p th:if="${#fields.hasErrors('specialtyId')}" th:errors="*{specialtyId}" class="text-danger small mt-1"></p>
+                            </div>
+
+                            <!-- Bác sĩ -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">2. Chọn Bác sĩ</label>
+                                <select id="doctorSelect" class="form-select" th:field="*{doctorId}" disabled>
+                                    <option value="" selected>-- Vui lòng chọn chuyên khoa trước --</option>
+                                </select>
+                                <p th:if="${#fields.hasErrors('doctorId')}" th:errors="*{doctorId}" class="text-danger small mt-1"></p>
+                            </div>
+
+                            <div class="row">
+                                <!-- Ngày khám -->
+                                <div class="col-md-6 mb-4">
+                                    <label class="form-label fw-bold">3. Chọn Ngày khám</label>
+                                    <input type="date" class="form-control" th:field="*{appointmentDate}" 
+                                           th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                                    <p th:if="${#fields.hasErrors('appointmentDate')}" th:errors="*{appointmentDate}" class="text-danger small mt-1"></p>
+                                </div>
+
+                                <!-- Giờ khám -->
+                                <div class="col-md-6 mb-4">
+                                    <label class="form-label fw-bold">4. Chọn Khung giờ</label>
+                                    <select class="form-select" th:field="*{appointmentTime}">
+                                        <option value="" selected>-- Chọn giờ --</option>
+                                        <option value="08:00:00">08:00</option>
+                                        <option value="09:00:00">09:00</option>
+                                        <option value="10:00:00">10:00</option>
+                                        <option value="11:00:00">11:00</option>
+                                        <option value="14:00:00">14:00</option>
+                                        <option value="15:00:00">15:00</option>
+                                        <option value="16:00:00">16:00</option>
+                                        <option value="17:00:00">17:00</option>
+                                    </select>
+                                    <p th:if="${#fields.hasErrors('appointmentTime')}" th:errors="*{appointmentTime}" class="text-danger small mt-1"></p>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                    Xác nhận đặt lịch
+                                </button>
+                                <a th:href="@{/patient/home}" class="btn btn-light">Hủy bỏ</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const bookForm = document.querySelector('form');
+        const doctorSelect = document.getElementById('doctorSelect');
+        const specialtySelect = document.getElementById('specialtySelect');
+
+        specialtySelect.addEventListener('change', function() {
+            const specialtyId = this.value;
+            
+            doctorSelect.innerHTML = '<option value="">-- Đang tải danh sách bác sĩ... --</option>';
+            doctorSelect.disabled = true;
+
+            if (specialtyId) {
+                fetch(`/patient/api/doctors-by-specialty?specialtyId=${specialtyId}`)
+                    .then(response => response.json())
+                    .then(doctors => {
+                        doctorSelect.innerHTML = '<option value="">-- Chọn bác sĩ --</option>';
+                        if (doctors.length > 0) {
+                            doctors.forEach(doc => {
+                                doctorSelect.innerHTML += `<option value="${doc.id}">${doc.fullName}</option>`;
+                            });
+                            doctorSelect.disabled = false;
+                        } else {
+                            doctorSelect.innerHTML = '<option value="">Không có bác sĩ nào cho chuyên khoa này</option>';
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error fetching doctors:', err);
+                        doctorSelect.innerHTML = '<option value="">Lỗi tải dữ liệu</option>';
+                    });
+            } else {
+                doctorSelect.innerHTML = '<option value="">-- Vui lòng chọn chuyên khoa trước --</option>';
+            }
+        });
+
+        // Client-side validation before submit
+        bookForm.addEventListener('submit', function(e) {
+            let hasError = false;
+            
+            if (!specialtySelect.value) {
+                alert('Vui lòng chọn chuyên khoa');
+                hasError = true;
+            } else if (!doctorSelect.value) {
+                alert('Vui lòng chọn bác sĩ');
+                hasError = true;
+            }
+
+            if (hasError) {
+                e.preventDefault();
+            }
+        });
+    </script>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

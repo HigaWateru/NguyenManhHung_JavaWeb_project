@@ -33,9 +33,7 @@ public class ProfileController {
             session.setAttribute("loginUser", user);
         }
 
-        if (user == null) {
-            return "redirect:/login";
-        }
+        if (user == null) return "redirect:/login";
 
         Profile profile = profileService.getProfileByUser(user);
         model.addAttribute("profile", profile);
@@ -57,9 +55,7 @@ public class ProfileController {
                                 @RequestParam(value = "image", required = false) MultipartFile image,
                                 HttpSession session) {
         User user = (User) session.getAttribute("loginUser");
-        if (user == null) {
-            return "redirect:/login";
-        }
+        if (user == null) return "redirect:/login";
 
         if (image != null && !image.isEmpty()) {
             String photoUrl = uploadService.upload(image);
@@ -67,6 +63,9 @@ public class ProfileController {
         }
 
         profileService.updateProfile(user, profile, description, specialtyId);
+        
+        // Update session
+        session.setAttribute("profile", profileService.getProfileByUser(user));
         
         return "redirect:/profile?success";
     }

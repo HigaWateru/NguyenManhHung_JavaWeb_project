@@ -25,7 +25,7 @@
                             <div class="card-body">
                                 <img th:src="${profile.photo != null ? profile.photo : 'https://via.placeholder.com/150'}" 
                                      alt="Avatar" class="rounded-circle img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                                <h5 class="card-title" th:text="${profile.fullName != null ? profile.fullName : user.username}">Username</h5>
+                                <h5 class="card-title" th:text="${profile.fullName != null and profile.fullName != '' ? profile.fullName : user.username}">Username</h5>
                                 <p class="text-muted" th:text="${user.role}">Role</p>
                             </div>
                         </div>

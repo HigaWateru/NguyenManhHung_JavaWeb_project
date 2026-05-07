@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,13 +26,36 @@ public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @GetMapping({"/", "/home"})
+    public String index(Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            var authorities = authentication.getAuthorities();
+            if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ADMIN"))) {
+                return "redirect:/admin/dashboard";
+            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("DOCTOR"))) {
+                return "redirect:/doctor/dashboard";
+            } else {
+                return "redirect:/patient/home";
+            }
+        }
+        return "redirect:/login";
+    }
+
     @GetMapping("/login")
-    public String login() {
+    public String login(Model model) {
+        model.addAttribute("loginForm", new LoginDto());
         return "login";
     }
 
+    @PostMapping("/login")
+    public String processLogin(@Valid @ModelAttribute("loginForm") LoginDto dto, BindingResult result) {
+        if (result.hasErrors()) return "login";
+        return "forward:/process-login";
+    }
+
     @PostMapping("/login-manual-backup")
-    public String loginManual(@Valid @ModelAttribute("loginForm") LoginDto dto, BindingResult result, HttpSession session) {
+    public String loginManual(@Valid @ModelAttribute("loginForm") LoginDto dto, BindingResult result,
+                              HttpSession session) {
         if (result.hasErrors()) return "login";
         User foundUser = userRepository.findByUsername(dto.getUsername());
         if (foundUser == null) {
@@ -57,6 +82,11 @@ public class UserController {
         return "register";
     }
 
+    @GetMapping("/access-denied")
+    public String accessDenied() {
+        return "error/403";
+    }
+
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("registerForm") RegisterDto dto, BindingResult result) {
         if (result.hasErrors()) return "register";
@@ -71,7 +101,8 @@ public class UserController {
             return "register";
         }
 
-        User user = User.builder().username(dto.getUsername()).password(passwordEncoder.encode(dto.getPassword())).role(Role.PATIENT).isActive(true).build();
+        User user = User.builder().username(dto.getUsername()).password(passwordEncoder.encode(dto.getPassword())).
+                role(Role.PATIENT).isActive(true).build();
 
         userRepository.save(user);
         return "redirect:/login";

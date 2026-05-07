@@ -11,7 +11,7 @@
                 </div>
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
-                        <form th:action="@{/login}" method="post">
+                        <form th:action="@{/login}" method="post" th:object="${loginForm}">
                             <h4 class="mb-4 fw-bold">Đăng nhập</h4>
                             
                             <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -27,17 +27,19 @@
                             <div class="mb-3">
                                 <label for="username" class="form-label">Tên đăng nhập</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
-                                    <input type="text" class="form-control border-start-0 ps-0 bg-light ml-2" id="username" name="username" placeholder="Nhập tên đăng nhập" required>
+                                    <span class="input-group-text"><i class="fas fa-user text-muted"></i></span>
+                                    <input type="text" class="form-control" id="username" th:field="*{username}" placeholder="Nhập tên đăng nhập">
                                 </div>
+                                <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="text-danger small mt-1"></p>
                             </div>
                             
                             <div class="mb-4">
                                 <label for="password" class="form-label">Mật khẩu</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
-                                    <input type="password" class="form-control border-start-0 ps-0 bg-light ml-2" id="password" name="password" placeholder="Nhập mật khẩu" required>
+                                    <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
+                                    <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Nhập mật khẩu">
                                 </div>
+                                <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-danger small mt-1"></p>
                             </div>
                             
                             <button type="submit" class="btn btn-primary w-100 mb-3 shadow-sm">Đăng nhập</button>

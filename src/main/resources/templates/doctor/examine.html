@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Khám bệnh')}"></head>
+<body class="bg-light">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0 fw-bold text-primary"><i class="fas fa-user-md me-2"></i>Tiếp nhận khám bệnh</h4>
+                            <a th:href="@{/doctor/dashboard}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-times me-1"></i>Hủy bỏ</a>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Patient Info -->
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-3 mb-4 d-flex align-items-center">
+                            <div class="bg-primary text-white p-3 rounded-circle me-3">
+                                <i class="fas fa-user fa-lg"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1 fw-bold" th:text="${appointment.patient.profile.fullName}">Họ tên bệnh nhân</h5>
+                                <div class="text-muted small">
+                                    <span class="me-3"><i class="fas fa-phone-alt me-1"></i>[[${appointment.patient.profile.phone}]]</span>
+                                    <span><i class="fas fa-calendar-alt me-1"></i>Ngày hẹn: [[${appointment.appointmentDate}]] lúc [[${appointment.appointmentTime}]]</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form th:action="@{/doctor/examine/{id}(id=${appointment.id})}" th:object="${examinationDto}" method="post" id="examForm">
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Chẩn đoán <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" th:field="*{diagnosis}" rows="2" placeholder="Nhập chẩn đoán bệnh..." required></textarea>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Triệu chứng & Ghi chú</label>
+                                    <textarea class="form-control" th:field="*{notes}" rows="3" placeholder="Nhập triệu chứng, ghi chú điều trị..."></textarea>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <label class="form-label fw-bold mb-0">Đơn thuốc (Tùy chọn)</label>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMedicineRow()">
+                                            <i class="fas fa-plus me-1"></i>Thêm thuốc
+                                        </button>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered align-middle" id="medicineTable">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="width: 40%">Tên thuốc</th>
+                                                    <th style="width: 15%">Số lượng</th>
+                                                    <th style="width: 35%">Cách dùng (Liều lượng)</th>
+                                                    <th style="width: 10%"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="medicineList">
+                                                <!-- Rows will be added here -->
+                                            </tbody>
+                                        </table>
+                                        <div id="noMedicineMsg" class="text-center py-3 text-muted border rounded-3 bg-light">
+                                            Chưa có thuốc nào được chọn.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mt-5">
+                                    <hr>
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold">
+                                            <i class="fas fa-save me-2"></i>Lưu kết quả & Kết thúc khám
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        let rowIdx = 0;
+        const medicines = [[${medicines}]];
+
+        function addMedicineRow() {
+            document.getElementById('noMedicineMsg').classList.add('d-none');
+            const tbody = document.getElementById('medicineList');
+            const row = document.createElement('tr');
+            
+            let options = '<option value="">-- Chọn thuốc --</option>';
+            medicines.forEach(m => {
+                options += `<option value="${m.id}">${m.name} (${m.unit})</option>`;
+            });
+
+            row.innerHTML = `
+                <td>
+                    <select class="form-select form-select-sm" name="medicines[${rowIdx}].medicineId" required>
+                        ${options}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm" name="medicines[${rowIdx}].quantity" min="1" required>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm" name="medicines[${rowIdx}].dosage" placeholder="Ví dụ: Sáng 1, tối 1 sau ăn" required>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-link text-danger p-0" onclick="removeRow(this)">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+            rowIdx++;
+        }
+
+        function removeRow(btn) {
+            btn.closest('tr').remove();
+            if (document.getElementById('medicineList').children.length === 0) {
+                document.getElementById('noMedicineMsg').classList.remove('d-none');
+            }
+        }
+    </script>
+
+    <footer th:replace="~{fragments/layout :: footer}" style="position: fixed; bottom: 0"></footer>
+</body>
+</html>

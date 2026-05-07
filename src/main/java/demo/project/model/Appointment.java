@@ -1,13 +1,21 @@
 package demo.project.model;
 
+import demo.project.model._enum.Status;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Appointment {
 
     @Id
@@ -22,7 +30,11 @@ public class Appointment {
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
-    private LocalDateTime appointmentTime;
+    private LocalDate appointmentDate;
+    private LocalTime appointmentTime;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @OneToMany(mappedBy = "appointment")
     private List<Payment> payments;

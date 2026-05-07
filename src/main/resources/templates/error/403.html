@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Truy cập bị từ chối')}"></head>
+<body class="bg-light">
+    <div class="main-content container">
+        <div class="row justify-content-center align-items-center vh-100">
+            <div class="col-md-6 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-exclamation-triangle text-danger fa-5x"></i>
+                </div>
+                <h1 class="display-4 fw-bold text-dark">403</h1>
+                <h2 class="mb-4">Truy cập bị từ chối</h2>
+                <p class="lead text-muted mb-5">
+                    Rất tiếc, bạn không có quyền truy cập vào trang này. 
+                    Vui lòng liên hệ quản trị viên hoặc quay lại trang chủ.
+                </p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="/home" class="btn btn-primary btn-lg px-4 gap-3">Quay lại trang chủ</a>
+                    <a href="/login" class="btn btn-outline-secondary btn-lg px-4">Đăng nhập tài khoản khác</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

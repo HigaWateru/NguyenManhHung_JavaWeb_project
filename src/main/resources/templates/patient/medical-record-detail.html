@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Chi tiết hồ sơ khám')}"></head>
+<body class="bg-light">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <!-- Header Actions -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <a th:href="@{/patient/home}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Quay lại</a>
+                    <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print me-1"></i>In hồ sơ</button>
+                </div>
+
+                <!-- Medical Record Card -->
+                <div class="card shadow-sm border-0 mb-4 overflow-hidden">
+                    <div class="card-header bg-primary text-white py-3 text-center">
+                        <h4 class="mb-0 fw-bold">HỒ SƠ KHÁM BỆNH</h4>
+                        <small>Mã hồ sơ: #[[${record.id}]] | Ngày khám: [[${appointment.appointmentDate}]]</small>
+                    </div>
+                    <div class="card-body p-4 p-md-5">
+                        <!-- Info Section -->
+                        <div class="row mb-5 border-bottom pb-4">
+                            <div class="col-sm-6 mb-3 mb-sm-0">
+                                <h6 class="text-uppercase text-muted small fw-bold mb-3">Thông tin bệnh nhân</h6>
+                                <p class="mb-1 fw-bold fs-5">[[${appointment.patient.profile.fullName}]]</p>
+                                <p class="mb-0 text-muted">SĐT: [[${appointment.patient.profile.phone}]]</p>
+                            </div>
+                            <div class="col-sm-6 text-sm-end">
+                                <h6 class="text-uppercase text-muted small fw-bold mb-3">Bác sĩ phụ trách</h6>
+                                <p class="mb-1 fw-bold fs-5">[[${appointment.doctor.user.profile.fullName}]]</p>
+                                <p class="mb-0 text-muted">Chuyên khoa: [[${appointment.doctor.specialty.name}]]</p>
+                            </div>
+                        </div>
+
+                        <!-- Diagnosis Section -->
+                        <div class="mb-5">
+                            <h6 class="text-uppercase text-primary small fw-bold mb-3"><i class="fas fa-diagnoses me-2"></i>Kết quả chẩn đoán</h6>
+                            <div class="p-3 bg-light rounded-3">
+                                <p class="mb-0 fw-bold">[[${record.diagnosis}]]</p>
+                            </div>
+                        </div>
+
+                        <!-- Notes Section -->
+                        <div class="mb-5" th:if="${record.notes != null && !record.notes.isEmpty()}">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-3"><i class="fas fa-sticky-note me-2"></i>Triệu chứng & Ghi chú điều trị</h6>
+                            <p class="text-muted" th:text="${record.notes}">Ghi chú của bác sĩ...</p>
+                        </div>
+
+                        <!-- Prescription Section -->
+                        <div class="mb-4" th:if="${prescriptionDetails != null && !prescriptionDetails.isEmpty()}">
+                            <h6 class="text-uppercase text-danger small fw-bold mb-3"><i class="fas fa-pills me-2"></i>Đơn thuốc chi tiết</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Tên thuốc</th>
+                                            <th class="text-center">Số lượng</th>
+                                            <th>Hướng dẫn sử dụng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="detail : ${prescriptionDetails}">
+                                            <td class="fw-bold" th:text="${detail.medicine.name}">Tên thuốc</td>
+                                            <td class="text-center" th:text="${detail.quantity + ' ' + detail.medicine.unit}">10 viên</td>
+                                            <td th:text="${detail.dosage}">Uống sáng 1 tối 1</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div th:unless="${prescriptionDetails != null && !prescriptionDetails.isEmpty()}" class="text-center py-4 bg-light rounded-3 mb-4">
+                            <p class="mb-0 text-muted small">Không có đơn thuốc đi kèm.</p>
+                        </div>
+
+                        <!-- Footer Note -->
+                        <div class="mt-5 pt-4 border-top text-center text-muted small">
+                            <p class="mb-0">Hồ sơ này được trích xuất từ hệ thống quản lý phòng khám trực tuyến.</p>
+                            <p>Vui lòng mang theo hồ sơ khi tái khám.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}" style="position: fixed; bottom: 0"></footer>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Thêm Bác Sĩ')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="main-content container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div th:replace="~{fragments/layout :: sidebar('doctors')}"></div>
+            </div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2 fw-bold">Thêm Bác Sĩ Mới</h1>
+                    <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Quay lại
+                    </a>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <form th:action="@{/admin/doctors/add}" th:object="${doctorForm}" method="post">
+                            <div class="row g-3">
+                                <!-- Thông tin tài khoản -->
+                                <div class="col-12 border-bottom pb-2 mb-2">
+                                    <h5 class="fw-bold text-primary mb-0"><i class="fas fa-user-circle me-2"></i>Thông tin tài khoản</h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="username" class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="username" th:field="*{username}" placeholder="VD: bacsi_an">
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="password" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Ít nhất 6 ký tự">
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                                </div>
+
+                                <!-- Thông tin cá nhân -->
+                                <div class="col-12 border-bottom pb-2 mb-2 mt-4">
+                                    <h5 class="fw-bold text-primary mb-0"><i class="fas fa-address-card me-2"></i>Thông tin cá nhân</h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="fullName" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="fullName" th:field="*{fullName}" placeholder="VD: Nguyễn Văn An">
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">Số điện thoại</label>
+                                    <input type="text" class="form-control" id="phone" th:field="*{phone}" placeholder="VD: 0987654321">
+                                </div>
+                                <div class="col-12">
+                                    <label for="address" class="form-label">Địa chỉ</label>
+                                    <input type="text" class="form-control" id="address" th:field="*{address}" placeholder="VD: 123 Đường Láng, Hà Nội">
+                                </div>
+
+                                <!-- Thông tin chuyên môn -->
+                                <div class="col-12 border-bottom pb-2 mb-2 mt-4">
+                                    <h5 class="fw-bold text-primary mb-0"><i class="fas fa-user-md me-2"></i>Thông tin chuyên môn</h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="specialtyId" class="form-label">Chuyên khoa <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="specialtyId" th:field="*{specialtyId}">
+                                        <option value="" selected disabled>-- Chọn chuyên khoa --</option>
+                                        <option th:each="s : ${specialties}" th:value="${s.id}" th:text="${s.name}"></option>
+                                    </select>
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('specialtyId')}" th:errors="*{specialtyId}"></div>
+                                </div>
+                                <div class="col-12">
+                                    <label for="description" class="form-label">Mô tả/Kinh nghiệm</label>
+                                    <textarea class="form-control" id="description" th:field="*{description}" rows="4" placeholder="Nhập tóm tắt kinh nghiệm làm việc..."></textarea>
+                                </div>
+
+                                <div class="col-12 mt-4 text-end">
+                                    <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">
+                                        <i class="fas fa-plus-circle me-2"></i>Lưu thông tin
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

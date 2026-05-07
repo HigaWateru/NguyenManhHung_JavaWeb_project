@@ -26,7 +26,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="text-muted small text-uppercase">Chờ khám</h6>
-                                        <h3 class="fw-bold mb-0 text-primary">05</h3>
+                                        <h3 class="fw-bold mb-0 text-primary" th:text="${#numbers.formatInteger(pendingCount, 2)}">05</h3>
                                     </div>
                                     <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
                                         <i class="fas fa-user-clock text-primary fa-lg"></i>
@@ -41,7 +41,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="text-muted small text-uppercase">Đã khám xong</h6>
-                                        <h3 class="fw-bold mb-0 text-success">12</h3>
+                                        <h3 class="fw-bold mb-0 text-success" th:text="${#numbers.formatInteger(completedCount, 2)}">12</h3>
                                     </div>
                                     <div class="bg-success bg-opacity-10 p-3 rounded-circle">
                                         <i class="fas fa-user-check text-success fa-lg"></i>
@@ -56,7 +56,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="text-muted small text-uppercase">Tổng ca khám</h6>
-                                        <h3 class="fw-bold mb-0 text-info">17</h3>
+                                        <h3 class="fw-bold mb-0 text-info" th:text="${#numbers.formatInteger(totalCount, 2)}">17</h3>
                                     </div>
                                     <div class="bg-info bg-opacity-10 p-3 rounded-circle">
                                         <i class="fas fa-users text-info fa-lg"></i>
@@ -83,22 +83,31 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="ps-4">1</td>
+                                    <tr th:each="appointment, iter : ${appointments}">
+                                        <td class="ps-4" th:text="${iter.count}">1</td>
                                         <td>
-                                            <div class="fw-bold">Lê Văn C</div>
-                                            <small class="text-muted">Nam, 28 tuổi</small>
+                                            <div class="fw-bold" th:text="${appointment.patient.profile != null and appointment.patient.profile.fullName != null and appointment.patient.profile.fullName != '' ? appointment.patient.profile.fullName : appointment.patient.username}">Lê Văn C</div>
+                                            <small class="text-muted" th:text="${appointment.patient.profile != null ? appointment.patient.profile.phone : ''}">SĐT</small>
                                         </td>
-                                        <td>08:30 - 09:00</td>
-                                        <td>Đau họng, sốt nhẹ</td>
-                                        <td><span class="badge bg-primary">Đang chờ</span></td>
+                                        <td>
+                                            <span th:text="${appointment.appointmentTime}">08:30</span> - 
+                                            <span th:text="${appointment.appointmentDate}">01/01/2026</span>
+                                        </td>
+                                        <td>Lịch khám sức khỏe</td>
+                                        <td>
+                                            <span class="badge" th:classappend="${appointment.status == T(demo.project.model._enum.Status).PENDING ? 'bg-primary' : (appointment.status == T(demo.project.model._enum.Status).COMPLETED ? 'bg-success' : 'bg-secondary')}" 
+                                                  th:text="${appointment.status}">PENDING</span>
+                                        </td>
                                         <td class="text-end pe-4">
-                                            <button class="btn btn-sm btn-success px-3">Bắt đầu khám <i class="fas fa-arrow-right ms-1"></i></button>
+                                            <a th:if="${appointment.status == T(demo.project.model._enum.Status).PENDING}" 
+                                               th:href="@{/doctor/examine/{id}(id=${appointment.id})}" 
+                                               class="btn btn-sm btn-success px-3">Bắt đầu khám <i class="fas fa-arrow-right ms-1"></i></a>
+                                            <span th:if="${appointment.status == T(demo.project.model._enum.Status).COMPLETED}" class="text-success small"><i class="fas fa-check-circle"></i> Đã xong</span>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr th:if="${#lists.isEmpty(appointments)}">
                                         <td colspan="6" class="text-center py-4 text-muted small">
-                                            Dữ liệu mẫu - Sẽ hiển thị thực tế từ danh sách đặt lịch (Appointments).
+                                            Không có lịch khám nào cho bạn.
                                         </td>
                                     </tr>
                                 </tbody>

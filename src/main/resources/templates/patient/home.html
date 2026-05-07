@@ -5,62 +5,74 @@
     <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
     <div class="main-content container mt-4">
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
         <!-- Hero Section -->
         <div class="p-5 mb-4 bg-primary text-white rounded-3 shadow">
             <div class="container-fluid py-5">
                 <h1 class="display-5 fw-bold">Chăm sóc sức khỏe thông minh</h1>
                 <p class="col-md-8 fs-4">Đặt lịch khám nhanh chóng, quản lý hồ sơ bệnh án điện tử và kết nối với các bác sĩ hàng đầu ngay tại nhà.</p>
-                <a th:href="${session.loginUser != null ? '/patient/appointment' : '/login'}" class="btn btn-light btn-lg px-4 fw-bold text-primary">Đặt lịch ngay <i class="fas fa-calendar-plus ms-2"></i></a>
+                <a th:href="${session.loginUser != null ? '/patient/appointments/book' : '/login'}" class="btn btn-light btn-lg px-4 fw-bold text-primary">Đặt lịch ngay <i class="fas fa-calendar-plus ms-2"></i></a>
             </div>
         </div>
 
         <div class="row g-4">
             <!-- Feature Cards -->
             <div class="col-md-4">
-                <div class="card h-100 text-center p-3">
-                    <div class="card-body">
-                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="fas fa-calendar-check fa-2x text-primary"></i>
+                <a th:href="${session.loginUser != null ? '/patient/appointments/book' : '/login'}" class="text-decoration-none text-dark">
+                    <div class="card h-100 text-center p-3 shadow-sm hover-card">
+                        <div class="card-body">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-calendar-check fa-2x text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Đặt lịch khám</h5>
+                            <p class="card-text text-muted">Chủ động chọn bác sĩ và thời gian khám phù hợp với lịch trình của bạn.</p>
                         </div>
-                        <h5 class="card-title fw-bold">Đặt lịch khám</h5>
-                        <p class="card-text text-muted">Chủ động chọn bác sĩ và thời gian khám phù hợp với lịch trình của bạn.</p>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-4">
-                <div class="card h-100 text-center p-3">
-                    <div class="card-body">
-                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="fas fa-file-medical fa-2x text-success"></i>
+                <a th:href="@{/patient/medical-history}" class="text-decoration-none text-dark">
+                    <div class="card h-100 text-center p-3 shadow-sm hover-card">
+                        <div class="card-body">
+                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-file-medical fa-2x text-success"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Hồ sơ bệnh án</h5>
+                            <p class="card-text text-muted">Xem lại lịch sử khám bệnh, kết quả chẩn đoán và đơn thuốc bất cứ lúc nào.</p>
                         </div>
-                        <h5 class="card-title fw-bold">Hồ sơ bệnh án</h5>
-                        <p class="card-text text-muted">Xem lại lịch sử khám bệnh, kết quả chẩn đoán và đơn thuốc bất cứ lúc nào.</p>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-4">
-                <div class="card h-100 text-center p-3">
-                    <div class="card-body">
-                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                            <i class="fas fa-user-md fa-2x text-info"></i>
+                <a th:href="@{/profile}" class="text-decoration-none text-dark">
+                    <div class="card h-100 text-center p-3 shadow-sm hover-card">
+                        <div class="card-body">
+                            <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-user-edit fa-2x text-info"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Hồ sơ cá nhân</h5>
+                            <p class="card-text text-muted">Cập nhật thông tin cá nhân và quản lý tài khoản của bạn.</p>
                         </div>
-                        <h5 class="card-title fw-bold">Bác sĩ chuyên khoa</h5>
-                        <p class="card-text text-muted">Đội ngũ bác sĩ giàu kinh nghiệm từ nhiều chuyên khoa khác nhau.</p>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
         <!-- Section for Logged In User -->
-        <div class="mt-5" th:if="${session.loginUser != null}">
-            <h3 class="fw-bold mb-4">Lịch hẹn gần đây</h3>
-            <div class="card">
+        <div class="mt-5 mb-5" th:if="${session.loginUser != null}">
+            <h3 class="fw-bold mb-4">Lịch hẹn của tôi</h3>
+            <div class="card shadow-sm">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="bg-light">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
                                 <tr>
                                     <th class="ps-4">Ngày khám</th>
+                                    <th>Giờ khám</th>
                                     <th>Bác sĩ</th>
                                     <th>Chuyên khoa</th>
                                     <th>Trạng thái</th>
@@ -68,8 +80,32 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="5" class="text-center py-4 text-muted">Bạn chưa có lịch hẹn nào. <a href="#">Đặt lịch ngay!</a></td>
+                                <tr th:each="app : ${appointments}">
+                                    <td class="ps-4" th:text="${app.appointmentDate}">01/01/2026</td>
+                                    <td th:text="${app.appointmentTime}">08:00</td>
+                                    <td>
+                                        <span th:if="${app.doctor.user.profile != null}" th:text="${app.doctor.user.profile.fullName}">BS. Nguyễn Văn A</span>
+                                        <span th:if="${app.doctor.user.profile == null}" th:text="${app.doctor.user.username}">doctor</span>
+                                    </td>
+                                    <td th:text="${app.doctor.specialty.name}">Nội khoa</td>
+                                    <td>
+                                        <span th:if="${app.status.name() == 'PENDING'}" class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                        <span th:if="${app.status.name() == 'CONFIRMED'}" class="badge bg-success">Đã xác nhận</span>
+                                        <span th:if="${app.status.name() == 'CANCELLED'}" class="badge bg-danger">Đã hủy</span>
+                                        <span th:if="${app.status.name() == 'COMPLETED'}" class="badge bg-info">Hoàn thành</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn btn-sm btn-outline-danger" th:if="${app.status.name() == 'PENDING'}">Hủy</button>
+                                        <a th:if="${app.status.name() == 'COMPLETED'}" 
+                                           th:href="@{/patient/medical-record/{id}(id=${app.id})}" 
+                                           class="btn btn-sm btn-info text-white"><i class="fas fa-file-medical me-1"></i>Hồ sơ</a>
+                                        <button class="btn btn-sm btn-outline-secondary" th:if="${app.status.name() != 'PENDING' && app.status.name() != 'COMPLETED'}" disabled>Hủy</button>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(appointments)}">
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        Bạn chưa có lịch hẹn nào. <a th:href="@{/patient/appointments/book}">Đặt lịch ngay!</a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -79,6 +115,6 @@
         </div>
     </div>
 
-    <footer th:replace="~{fragments/layout :: footer}" style="position: fixed; bottom: 0"></footer>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

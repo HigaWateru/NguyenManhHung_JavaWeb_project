@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Quan ly chuyen khoa')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="main-content container-fluid">
+        <div class="row">
+            <div class="col-md-3 col-lg-2 px-0">
+                <div th:replace="~{fragments/layout :: sidebar('specialties')}"></div>
+            </div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <div>
+                        <h1 class="h2 fw-bold mb-1">Quản lý chuyên khoa</h1>
+                        <p class="text-muted mb-0">Thêm, sửa và theo dõi các chuyên khoa đang hoạt động.</p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="mb-0 fw-bold">Thêm chuyên khoa</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/admin/specialties/add}" th:object="${specialty}" method="post">
+                                    <div class="mb-3">
+                                        <label class="form-label">Tên chuyên khoa</label>
+                                        <input type="text" th:field="*{name}" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Mô tả</label>
+                                        <textarea th:field="*{description}" class="form-control" rows="4"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus me-1"></i> Thêm mới
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="mb-0 fw-bold">Danh sách chuyên khoa</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="ps-4">Tên chuyên khoa</th>
+                                                <th>Mô tả</th>
+                                                <th class="text-center">Bác sĩ</th>
+                                                <th class="text-end pe-4">Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="item : ${specialties}">
+                                                <td class="ps-4 fw-bold" th:text="${item.name}">Nội tổng quát</td>
+                                                <td class="text-muted" th:text="${item.description != null and item.description != '' ? item.description : 'Chưa có mô tả'}">Mô tả</td>
+                                                <td class="text-center" th:text="${item.doctors != null ? #lists.size(item.doctors) : 0}">0</td>
+                                                <td class="text-end pe-4">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" th:data-bs-target="${'#editSpecialty' + item.id}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteSpecialtyModal"
+                                                            th:data-delete-url="@{/admin/specialties/delete/{id}(id=${item.id})}"
+                                                            th:data-specialty-name="${item.name}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+
+                                                    <div class="modal fade text-start" th:id="${'editSpecialty' + item.id}" tabindex="-1" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <form th:action="@{/admin/specialties/edit/{id}(id=${item.id})}" method="post">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">Cập nhật chuyên khoa</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Tên chuyên khoa</label>
+                                                                            <input type="text" name="name" class="form-control" th:value="${item.name}" required>
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Mô tả</label>
+                                                                            <textarea name="description" class="form-control" rows="4" th:text="${item.description}"></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                        <button type="submit" class="btn btn-primary">Lưu</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(specialties)}">
+                                                <td colspan="4" class="text-center py-5 text-muted">Chưa có chuyên khoa nào.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteSpecialtyModal" tabindex="-1" aria-labelledby="deleteSpecialtyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deleteSpecialtyForm" method="get">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteSpecialtyModalLabel">Xác nhận xoá chuyên khoa</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn xoá chuyên khoa <strong id="deleteSpecialtyName"></strong> không?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Xác nhận xoá</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script>
+        const deleteSpecialtyModal = document.getElementById('deleteSpecialtyModal');
+        deleteSpecialtyModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const deleteUrl = button.getAttribute('data-delete-url');
+            const specialtyName = button.getAttribute('data-specialty-name');
+
+            document.getElementById('deleteSpecialtyForm').setAttribute('action', deleteUrl);
+            document.getElementById('deleteSpecialtyName').textContent = specialtyName;
+        });
+    </script>
+</body>
+</html>

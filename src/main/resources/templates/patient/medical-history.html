@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ho so benh an')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="main-content container-fluid">
+        <div class="row">
+            <div class="col-md-3 col-lg-2 px-0">
+                <div th:replace="~{fragments/layout :: sidebar('medical-history')}"></div>
+            </div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <div>
+                        <h1 class="h2 fw-bold mb-1">Hồ sơ bệnh án</h1>
+                        <p class="text-muted mb-0">Theo dõi các lần khám đã hoàn thành và xem chi tiết kết quả.</p>
+                    </div>
+                    <a th:href="@{/patient/appointments/book}" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus me-1"></i> Đặt lịch khám
+                    </a>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-start border-primary border-4">
+                            <div class="card-body">
+                                <h6 class="text-muted text-uppercase small">Tổng hồ sơ</h6>
+                                <h3 class="fw-bold mb-0" th:text="${#lists.size(appointments)}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-start border-success border-4">
+                            <div class="card-body">
+                                <h6 class="text-muted text-uppercase small">Lần khám gần nhất</h6>
+                                <h3 class="fw-bold mb-0 fs-5" th:text="${#lists.isEmpty(appointments) ? 'Chua co' : appointments[0].appointmentDate}">Chua co</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-start border-info border-4">
+                            <div class="card-body">
+                                <h6 class="text-muted text-uppercase small">Trạng thái</h6>
+                                <h3 class="fw-bold mb-0 fs-5 text-success">Đã đồng bộ</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold">Danh sách hồ sơ khám bệnh</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">Mã lịch</th>
+                                        <th>Ngày khám</th>
+                                        <th>Bác sĩ</th>
+                                        <th>Chuyên khoa</th>
+                                        <th>Trạng thái</th>
+                                        <th class="text-end pe-4">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="appointment : ${appointments}">
+                                        <td class="ps-4 fw-bold" th:text="${'#' + appointment.id}">#1</td>
+                                        <td>
+                                            <div th:text="${appointment.appointmentDate}">2026-05-07</div>
+                                            <small class="text-muted" th:text="${appointment.appointmentTime}">08:00</small>
+                                        </td>
+                                        <td th:text="${appointment.doctor.user.profile != null ? appointment.doctor.user.profile.fullName : appointment.doctor.user.username}">Bác sĩ</td>
+                                        <td th:text="${appointment.doctor.specialty != null ? appointment.doctor.specialty.name : 'Chưa cập nhật'}">Nội tổng quát</td>
+                                        <td><span class="badge bg-success">Đã khám</span></td>
+                                        <td class="text-end pe-4">
+                                            <a th:href="@{/patient/medical-record/{id}(id=${appointment.id})}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-file-medical me-1"></i> Xem hồ sơ
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(appointments)}">
+                                        <td colspan="6" class="text-center py-5 text-muted">Chưa có hồ sơ bệnh nhân nào.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

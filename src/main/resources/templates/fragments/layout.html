@@ -91,13 +91,10 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
         }
-        /* footer {
+        footer {
             position: fixed;
             bottom: 0;
             width: 100%;
-        } */
-        footer {
-            margin-top: auto;
         }
     </style>
 </head>
@@ -120,7 +117,7 @@
                     <span class="navbar-text me-3">
                         <i class="fas fa-user-circle me-1"></i>
                         Xin chào, <strong th:text="${session.profile != null and session.profile.fullName != null and session.profile.fullName != '' ? session.profile.fullName : session.loginUser.username}">User</strong> 
-                        (<span class="badge bg-info text-dark" th:text="${session.loginUser.role}">Role</span>)
+                        <span class="badge bg-info text-white" th:text="${session.loginUser.role}">Role</span>
                     </span>
                 </li>
                 <li class="nav-item" th:if="${session.loginUser == null}">
@@ -152,10 +149,10 @@
             <a th:href="@{/admin/medicines}" class="nav-link" th:classappend="${activeLink == 'medicines' ? 'active' : ''}">
                 <i class="fas fa-pills"></i> Quản lý thuốc
             </a>
-            <a href="#" class="nav-link" th:classappend="${activeLink == 'specialties' ? 'active' : ''}">
+            <a th:href="@{/admin/specialties}" class="nav-link" th:classappend="${activeLink == 'specialties' ? 'active' : ''}">
                 <i class="fas fa-stethoscope"></i> Chuyên khoa
             </a>
-            <a href="#" class="nav-link" th:classappend="${activeLink == 'prescriptions' ? 'active' : ''}">
+            <a th:href="@{/admin/prescriptions}" class="nav-link" th:classappend="${activeLink == 'prescriptions' ? 'active' : ''}">
                 <i class="fas fa-file-invoice-dollar"></i> Duyệt đơn thuốc
             </a>
             <a th:href="@{/admin/doctors/add}" class="nav-link" th:classappend="${activeLink == 'doctors' ? 'active' : ''}">
@@ -169,8 +166,19 @@
             <a th:href="@{/doctor/dashboard}" class="nav-link" th:classappend="${activeLink == 'dashboard' ? 'active' : ''}">
                 <i class="fas fa-clipboard-list"></i> Lịch chờ khám
             </a>
-            <a href="#" class="nav-link" th:classappend="${activeLink == 'history' ? 'active' : ''}">
+            <a th:href="@{/doctor/history}" class="nav-link" th:classappend="${activeLink == 'history' ? 'active' : ''}">
                 <i class="fas fa-history"></i> Lịch sử khám
+            </a>
+        </div>
+
+        <!-- Patient Menu -->
+        <div th:if="${session.loginUser != null and session.loginUser.role.name() == 'PATIENT'}">
+            <h6 class="px-4 text-uppercase fw-bold small text-muted mb-3">Bệnh nhân</h6>
+            <a th:href="@{/patient/home}" class="nav-link" th:classappend="${activeLink == 'patient-home' ? 'active' : ''}">
+                <i class="fas fa-calendar-check"></i> Lịch khám của tôi
+            </a>
+            <a th:href="@{/patient/medical-history}" class="nav-link" th:classappend="${activeLink == 'medical-history' ? 'active' : ''}">
+                <i class="fas fa-file-medical"></i> Hồ sơ bệnh án
             </a>
         </div>
 

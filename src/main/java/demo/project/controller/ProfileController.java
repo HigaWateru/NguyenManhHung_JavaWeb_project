@@ -38,11 +38,13 @@ public class ProfileController {
         Profile profile = profileService.getProfileByUser(user);
         model.addAttribute("profile", profile);
         model.addAttribute("user", user);
+        model.addAttribute("backLink", "/home");
 
         if (user.getRole().name().equals("DOCTOR")) {
             Doctor doctor = profileService.getDoctorByUser(user);
             model.addAttribute("doctor", doctor);
             model.addAttribute("specialties", specialtyRepository.findAll());
+            model.addAttribute("backLink", "/doctor/dashboard");
         }
 
         return "profile";

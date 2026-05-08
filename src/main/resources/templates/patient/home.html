@@ -9,6 +9,10 @@
             <span th:text="${successMessage}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
         <!-- Hero Section -->
         <div class="p-5 mb-4 bg-primary text-white rounded-3 shadow">
@@ -95,11 +99,25 @@
                                         <span th:if="${app.status.name() == 'COMPLETED'}" class="badge bg-info">Hoàn thành</span>
                                     </td>
                                     <td class="text-end pe-4">
-                                        <button class="btn btn-sm btn-outline-danger" th:if="${app.status.name() == 'PENDING'}">Hủy</button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger"
+                                                th:if="${app.status.name() == 'PENDING'}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#confirmModal"
+                                                th:data-cancel-url="@{/patient/appointments/{id}/cancel(id=${app.id})}">
+                                            Hủy
+                                        </button>
                                         <a th:if="${app.status.name() == 'COMPLETED'}" 
                                            th:href="@{/patient/medical-record/{id}(id=${app.id})}" 
                                            class="btn btn-sm btn-info text-white"><i class="fas fa-file-medical me-1"></i>Hồ sơ</a>
-                                        <button class="btn btn-sm btn-outline-secondary" th:if="${app.status.name() != 'PENDING' && app.status.name() != 'COMPLETED'}" disabled>Hủy</button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary"
+                                                th:if="${app.status.name() == 'CONFIRMED'}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#confirmModal"
+                                                th:data-cancel-url="@{/patient/appointments/{id}/cancel(id=${app.id})}">
+                                            Hủy
+                                        </button>
                                     </td>
                                 </tr>
                                 <tr th:if="${#lists.isEmpty(appointments)}">
@@ -115,6 +133,35 @@
         </div>
     </div>
 
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="cancelAppointmentForm" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Xác nhận hủy lịch hẹn</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn hủy lịch hẹn này không?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script>
+        const confirmModal = document.getElementById('confirmModal');
+        confirmModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const cancelUrl = button.getAttribute('data-cancel-url');
+            document.getElementById('cancelAppointmentForm').setAttribute('action', cancelUrl);
+        });
+    </script>
 </body>
 </html>

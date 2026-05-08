@@ -72,7 +72,7 @@ public class DataInitializer implements CommandLineRunner {
                     .role(Role.ADMIN).isActive(true).build();
             userRepository.save(admin);
 
-            Profile adminProfile = Profile.builder().user(admin).fullName("Quản trị viên Hệ thống").phone("0123456789")
+            Profile adminProfile = Profile.builder().user(admin).fullName("Pengunistrator").phone("0123456789")
                     .build();
             profileRepository.save(adminProfile);
             System.out.println("Đã tạo tài khoản admin mẫu: admin/123456");
@@ -84,7 +84,7 @@ public class DataInitializer implements CommandLineRunner {
                     .role(Role.DOCTOR).isActive(true).build();
             userRepository.save(doctorUser);
 
-            Profile doctorProfile = Profile.builder().user(doctorUser).fullName("Bác sĩ Nguyễn Văn A")
+            Profile doctorProfile = Profile.builder().user(doctorUser).fullName("Nguyễn Văn A")
                     .phone("0987654321").build();
             profileRepository.save(doctorProfile);
 
@@ -100,8 +100,8 @@ public class DataInitializer implements CommandLineRunner {
                     .role(Role.PATIENT).isActive(true).build();
             userRepository.save(patient);
 
-            Profile patientProfile = Profile.builder().user(patient).fullName("Bệnh nhân Nguyễn Văn B")
-                    .phone("0333444555").build();
+            Profile patientProfile = Profile.builder().user(patient).fullName("Nguyễn Văn B").phone("0333444555")
+                    .build();
             profileRepository.save(patientProfile);
             System.out.println("Đã tạo tài khoản bệnh nhân mẫu: patient/123456");
         }

@@ -30,7 +30,7 @@ public class ExaminationService {
         medicalRecordRepository.save(record);
 
         if (dto.getMedicines() != null && !dto.getMedicines().isEmpty()) {
-            Prescription prescription = Prescription.builder().medicalRecord(record).status(Status.COMPLETED).build();
+            Prescription prescription = Prescription.builder().medicalRecord(record).status(Status.PENDING).build();
             prescriptionRepository.save(prescription);
 
             for (ExaminationDto.MedicineItem item : dto.getMedicines()) {

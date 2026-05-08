@@ -50,11 +50,14 @@
                                             <a th:href="@{/admin/medicines/edit/{id}(id=${m.id})}" class="btn btn-sm btn-outline-primary me-1">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a th:href="@{/admin/medicines/delete/{id}(id=${m.id})}" 
-                                               class="btn btn-sm btn-outline-danger"
-                                               onclick="return confirm('Bạn có chắc chắn muốn xóa thuốc này?')">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteMedicineModal"
+                                                    th:data-delete-url="@{/admin/medicines/delete/{id}(id=${m.id})}"
+                                                    th:data-medicine-name="${m.name}">
                                                 <i class="fas fa-trash"></i>
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
                                     <tr th:if="${#lists.isEmpty(medicines)}">
@@ -69,6 +72,38 @@
         </div>
     </div>
 
+    <div class="modal fade" id="deleteMedicineModal" tabindex="-1" aria-labelledby="deleteMedicineModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deleteMedicineForm" method="get">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteMedicineModalLabel">Xác nhận xoá thuốc</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn xoá thuốc <strong id="deleteMedicineName"></strong> không?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Xác nhận xoá</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script>
+        const deleteMedicineModal = document.getElementById('deleteMedicineModal');
+        deleteMedicineModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const deleteUrl = button.getAttribute('data-delete-url');
+            const medicineName = button.getAttribute('data-medicine-name');
+
+            document.getElementById('deleteMedicineForm').setAttribute('action', deleteUrl);
+            document.getElementById('deleteMedicineName').textContent = medicineName;
+        });
+    </script>
 </body>
 </html>

@@ -77,6 +77,7 @@
         const bookForm = document.querySelector('form');
         const doctorSelect = document.getElementById('doctorSelect');
         const specialtySelect = document.getElementById('specialtySelect');
+        const selectedDoctorId = /*[[${appointmentForm.doctorId}]]*/ null;
 
         specialtySelect.addEventListener('change', function() {
             const specialtyId = this.value;
@@ -85,13 +86,17 @@
             doctorSelect.disabled = true;
 
             if (specialtyId) {
-                fetch(`/patient/api/doctors-by-specialty?specialtyId=${specialtyId}`)
+                fetch(`/patient/api/doctors-by-specialty?specialtyId=${encodeURIComponent(specialtyId)}`)
                     .then(response => response.json())
                     .then(doctors => {
                         doctorSelect.innerHTML = '<option value="">-- Chọn bác sĩ --</option>';
                         if (doctors.length > 0) {
                             doctors.forEach(doc => {
-                                doctorSelect.innerHTML += `<option value="${doc.id}">${doc.fullName}</option>`;
+                                const option = new Option(doc.fullName, doc.id);
+                                if (selectedDoctorId && String(doc.id) === String(selectedDoctorId)) {
+                                    option.selected = true;
+                                }
+                                doctorSelect.add(option);
                             });
                             doctorSelect.disabled = false;
                         } else {
@@ -107,7 +112,10 @@
             }
         });
 
-        // Client-side validation before submit
+        if (specialtySelect.value) {
+            specialtySelect.dispatchEvent(new Event('change'));
+        }
+
         bookForm.addEventListener('submit', function(e) {
             let hasError = false;
             

@@ -28,6 +28,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Tên thuốc</label>
                                     <input type="text" class="form-control" th:field="*{name}" placeholder="VD: Paracetamol 500mg" required>
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Đơn vị tính</label>

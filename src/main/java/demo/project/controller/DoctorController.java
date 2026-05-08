@@ -40,7 +40,7 @@ public class DoctorController {
                 List<Appointment> appointments = appointmentRepository.findByDoctor(doctor);
                 model.addAttribute("appointments", appointments);
                 
-                // Thống kê thực tế
+                // Thống kê
                 long pendingCount = appointmentRepository.countByDoctorAndStatus(doctor, Status.PENDING);
                 long completedCount = appointmentRepository.countByDoctorAndStatus(doctor, Status.COMPLETED);
                 long totalCount = appointmentRepository.countByDoctor(doctor);
@@ -51,6 +51,20 @@ public class DoctorController {
             }
         }
         return "doctor/dashboard";
+    }
+
+    @GetMapping("/history")
+    public String examinationHistory(HttpSession session, Model model) {
+        String username = (String) session.getAttribute("username");
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            session.setAttribute("loginUser", user);
+            Doctor doctor = doctorRepository.findByUser(user);
+            if (doctor != null) {
+                model.addAttribute("appointments", appointmentRepository.findByDoctorAndStatus(doctor, Status.COMPLETED));
+            }
+        }
+        return "doctor/history";
     }
 
     @GetMapping("/examine/{appointmentId}")

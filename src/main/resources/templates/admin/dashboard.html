@@ -6,12 +6,10 @@
 
     <div class="main-content container-fluid">
         <div class="row">
-            <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 px-0">
                 <div th:replace="~{fragments/layout :: sidebar('dashboard')}"></div>
             </div>
 
-            <!-- Main Content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
                 <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
                     <span th:text="${successMessage}"></span>
@@ -19,7 +17,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2 fw-bold">Dashboard Quản trị</h1>
+                    <h1 class="h2 fw-bold">Dashboard quản trị</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <a th:href="@{/admin/doctors/add}" class="btn btn-sm btn-primary me-2">
                             <i class="fas fa-plus me-1"></i> Thêm bác sĩ
@@ -30,32 +28,31 @@
                     </div>
                 </div>
 
-                <!-- Stats Cards -->
                 <div class="row g-4 mb-4">
                     <div class="col-md-3">
                         <div class="card bg-primary text-white">
                             <div class="card-body">
                                 <h6 class="card-title text-uppercase small">Tổng thuốc trong kho</h6>
-                                <h2 class="fw-bold mb-0">1,250</h2>
-                                <p class="mb-0 small mt-2"><i class="fas fa-arrow-up"></i> +5% so với tháng trước</p>
+                                <h2 class="fw-bold mb-0" th:text="${#numbers.formatInteger(totalMedicineStock, 1, 'COMMA')}">0</h2>
+                                <p class="mb-0 small mt-2"><i class="fas fa-boxes-stacked"></i>Tổng số lượng tồn kho</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card bg-success text-white">
                             <div class="card-body">
-                                <h6 class="card-title text-uppercase small">Đơn thuốc đã phát</h6>
-                                <h2 class="fw-bold mb-0">48</h2>
-                                <p class="mb-0 small mt-2"><i class="fas fa-check-circle"></i> Hoàn thành tốt</p>
+                                <h6 class="card-title text-uppercase small">Đơn thuốc đã duyệt</h6>
+                                <h2 class="fw-bold mb-0" th:text="${approvedPrescriptionCount}">0</h2>
+                                <p class="mb-0 small mt-2"><i class="fas fa-check-circle"></i> Đã cập nhật</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card bg-warning text-dark">
                             <div class="card-body">
-                                <h6 class="card-title text-uppercase small">Đơn chờ duyệt</h6>
-                                <h2 class="fw-bold mb-0">12</h2>
-                                <p class="mb-0 small mt-2"><i class="fas fa-clock"></i> Cần xử lý ngay</p>
+                                <h6 class="card-title text-uppercase small">Đơn cho duyệt</h6>
+                                <h2 class="fw-bold mb-0" th:text="${pendingPrescriptionCount}">0</h2>
+                                <p class="mb-0 small mt-2"><i class="fas fa-clock"></i> Cần xử lý</p>
                             </div>
                         </div>
                     </div>
@@ -63,17 +60,17 @@
                         <div class="card bg-info text-white">
                             <div class="card-body">
                                 <h6 class="card-title text-uppercase small">Chuyên khoa</h6>
-                                <h2 class="fw-bold mb-0">8</h2>
-                                <p class="mb-0 small mt-2"><i class="fas fa-hospital"></i> Hoạt động ổn định</p>
+                                <h2 class="fw-bold mb-0" th:text="${specialtyCount}">0</h2>
+                                <p class="mb-0 small mt-2"><i class="fas fa-hospital"></i> Đang hoạt động</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Activity Table -->
                 <div class="card">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="card-title mb-0 fw-bold">Đơn thuốc chờ cấp phát gần đây</h5>
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 fw-bold">Đơn thuốc gần đây</h5>
+                        <a th:href="@{/admin/prescriptions}" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -82,27 +79,30 @@
                                     <tr>
                                         <th class="ps-4">Mã đơn</th>
                                         <th>Bệnh nhân</th>
-                                        <th>Bác sĩ kê</th>
+                                        <th>Bác sĩ kê đơn</th>
                                         <th>Ngày kê</th>
                                         <th>Trạng thái</th>
                                         <th class="text-end pe-4">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="ps-4 fw-bold">#DT-2026-001</td>
-                                        <td>Nguyễn Văn A</td>
-                                        <td>BS. Trần Thị B</td>
-                                        <td>06/05/2026</td>
-                                        <td><span class="badge bg-warning text-dark">Chờ phát thuốc</span></td>
+                                    <tr th:each="prescription : ${recentPrescriptions}">
+                                        <td class="ps-4 fw-bold" th:text="${'#DT-' + prescription.id}">#DT-1</td>
+                                        <td th:text="${prescription.medicalRecord.appointment.patient.profile != null ? prescription.medicalRecord.appointment.patient.profile.fullName : prescription.medicalRecord.appointment.patient.username}">Benh nhan</td>
+                                        <td th:text="${prescription.medicalRecord.appointment.doctor.user.profile != null ? prescription.medicalRecord.appointment.doctor.user.profile.fullName : prescription.medicalRecord.appointment.doctor.user.username}">Bac si</td>
+                                        <td th:text="${prescription.medicalRecord.appointment.appointmentDate}">2026-05-07</td>
+                                        <td>
+                                            <span class="badge"
+                                                  th:classappend="${prescription.status == T(demo.project.model._enum.Status).PENDING ? 'bg-warning text-dark' : (prescription.status == T(demo.project.model._enum.Status).CONFIRMED ? 'bg-success' : 'bg-secondary')}"
+                                                  th:text="${prescription.status}">PENDING</span>
+                                        </td>
                                         <td class="text-end pe-4">
-                                            <button class="btn btn-sm btn-primary">Xử lý</button>
+                                            <a th:if="${prescription.status == T(demo.project.model._enum.Status).PENDING}" th:href="@{/admin/prescriptions}" class="btn btn-sm btn-primary">Xử lý</a>
+                                            <span th:unless="${prescription.status == T(demo.project.model._enum.Status).PENDING}" class="text-success small"><i class="fas fa-check-circle"></i> Đã duyệt</span>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td colspan="6" class="text-center py-4 text-muted small">
-                                            Dữ liệu mẫu - Sẽ hiển thị thực tế khi có nghiệp vụ.
-                                        </td>
+                                    <tr th:if="${#lists.isEmpty(recentPrescriptions)}">
+                                        <td colspan="6" class="text-center py-4 text-muted small">Chưa có đơn thuốc nào.</td>
                                     </tr>
                                 </tbody>
                             </table>

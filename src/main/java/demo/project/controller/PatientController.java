@@ -125,6 +125,36 @@ public class PatientController {
         return "redirect:/patient/home";
     }
 
+    @PostMapping("/appointments/{appointmentId}/cancel")
+    public String cancelAppointment(@PathVariable Long appointmentId, HttpSession session,
+                                    RedirectAttributes redirectAttributes) {
+        User user = (User) session.getAttribute("loginUser");
+        if (user == null) {
+            String username = (String) session.getAttribute("username");
+            user = username != null ? userRepository.findByUsername(username) : null;
+        }
+
+        if (user == null) return "redirect:/login";
+
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        if (!appointment.getPatient().getId().equals(user.getId())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền hủy lịch hẹn này.");
+            return "redirect:/patient/home";
+        }
+
+        if (appointment.getStatus() == Status.PENDING || appointment.getStatus() == Status.CONFIRMED) {
+            appointment.setStatus(Status.CANCELLED);
+            appointmentRepository.save(appointment);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã hủy lịch hẹn thành công!");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lịch hẹn này không thể hủy.");
+        }
+
+        return "redirect:/patient/home";
+    }
+
     @GetMapping("/api/doctors-by-specialty")
     @ResponseBody
     public List<DoctorResponse> getDoctorsBySpecialty(@RequestParam Long specialtyId) {

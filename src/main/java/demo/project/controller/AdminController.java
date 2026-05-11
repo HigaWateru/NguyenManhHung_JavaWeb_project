@@ -2,6 +2,7 @@ package demo.project.controller;
 
 import demo.project.dto.DoctorDto;
 import demo.project.model.Doctor;
+import demo.project.model.LabTestType;
 import demo.project.model.Medicine;
 import demo.project.model.Prescription;
 import demo.project.model.PrescriptionDetail;
@@ -11,6 +12,7 @@ import demo.project.model.User;
 import demo.project.model._enum.Role;
 import demo.project.model._enum.Status;
 import demo.project.repository.DoctorRepository;
+import demo.project.repository.LabTestTypeRepository;
 import demo.project.repository.MedicineRepository;
 import demo.project.repository.PrescriptionDetailRepository;
 import demo.project.repository.PrescriptionRepository;
@@ -39,6 +41,7 @@ public class AdminController {
     private final SpecialtyRepository specialtyRepository;
     private final ProfileRepository profileRepository;
     private final MedicineRepository medicineRepository;
+    private final LabTestTypeRepository labTestTypeRepository;
     private final PrescriptionRepository prescriptionRepository;
     private final PrescriptionDetailRepository prescriptionDetailRepository;
     private final PasswordEncoder passwordEncoder;
@@ -56,11 +59,62 @@ public class AdminController {
         model.addAttribute("approvedPrescriptionCount", approvedCount);
         model.addAttribute("pendingPrescriptionCount", prescriptionRepository.countByStatus(Status.PENDING));
         model.addAttribute("specialtyCount", specialtyRepository.count());
+        model.addAttribute("labTestTypeCount", labTestTypeRepository.count());
         model.addAttribute("recentPrescriptions", prescriptionRepository.findTop5ByOrderByIdDesc());
         return "admin/dashboard";
     }
 
-    // --- MEDICINE MANAGEMENT ---
+    // lab test type
+    @GetMapping("/lab-tests")
+    public String listLabTestTypes(Model model) {
+        model.addAttribute("labTestTypes", labTestTypeRepository.findAll());
+        model.addAttribute("labTestType", LabTestType.builder().active(true).build());
+        return "admin/lab-tests";
+    }
+
+    @PostMapping("/lab-tests/add")
+    public String addLabTestType(@ModelAttribute LabTestType labTestType, RedirectAttributes redirectAttributes) {
+        normalizeLabTestType(labTestType);
+        labTestTypeRepository.save(labTestType);
+        redirectAttributes.addFlashAttribute("successMessage", "Thêm loại xét nghiệm thành công!");
+        return "redirect:/admin/lab-tests";
+    }
+
+    @PostMapping("/lab-tests/edit/{id}")
+    public String updateLabTestType(@PathVariable Long id, @ModelAttribute LabTestType labTestType,
+                                    RedirectAttributes redirectAttributes) {
+        LabTestType existingLabTestType = labTestTypeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid lab test type Id:" + id));
+        existingLabTestType.setName(labTestType.getName());
+        existingLabTestType.setDescription(labTestType.getDescription());
+        existingLabTestType.setPrice(labTestType.getPrice());
+        existingLabTestType.setActive(Boolean.TRUE.equals(labTestType.getActive()));
+        normalizeLabTestType(existingLabTestType);
+        labTestTypeRepository.save(existingLabTestType);
+        redirectAttributes.addFlashAttribute("successMessage", "Cập nhật loại xét nghiệm thành công!");
+        return "redirect:/admin/lab-tests";
+    }
+
+    @GetMapping("/lab-tests/delete/{id}")
+    public String deleteLabTestType(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        LabTestType labTestType = labTestTypeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid lab test type Id:" + id));
+        labTestType.setActive(false);
+        labTestTypeRepository.save(labTestType);
+        redirectAttributes.addFlashAttribute("successMessage", "Đã tạm ngưng loại xét nghiệm!");
+        return "redirect:/admin/lab-tests";
+    }
+
+    private void normalizeLabTestType(LabTestType labTestType) {
+        if (labTestType.getName() != null) {
+            labTestType.setName(labTestType.getName().trim());
+        }
+        if (labTestType.getActive() == null) {
+            labTestType.setActive(false);
+        }
+    }
+
+    // medicine
     @GetMapping("/medicines")
     public String listMedicines(Model model) {
         model.addAttribute("medicines", medicineRepository.findAll());
@@ -132,7 +186,7 @@ public class AdminController {
         return "redirect:/admin/medicines";
     }
 
-    // --- PRESCRIPTION APPROVAL ---
+    //  prescription approval
     @GetMapping("/prescriptions")
     public String listPrescriptions(Model model) {
         model.addAttribute("prescriptions", prescriptionRepository.findAll());
@@ -185,7 +239,7 @@ public class AdminController {
         return "redirect:/admin/prescriptions";
     }
 
-    // --- SPECIALTY MANAGEMENT ---
+    // specialty
     @GetMapping("/specialties")
     public String listSpecialties(Model model) {
         model.addAttribute("specialties", specialtyRepository.findAll());
@@ -219,7 +273,7 @@ public class AdminController {
         return "redirect:/admin/specialties";
     }
 
-    // --- DOCTOR MANAGEMENT ---
+    // doctor
     @GetMapping("/doctors/add")
     public String addDoctorForm(Model model) {
         model.addAttribute("doctorForm", new DoctorDto());

@@ -34,9 +34,7 @@ public class UserController {
                 return "redirect:/admin/dashboard";
             } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("DOCTOR"))) {
                 return "redirect:/doctor/dashboard";
-            } else {
-                return "redirect:/patient/home";
-            }
+            } else return "redirect:/patient/home";
         }
         return "redirect:/login";
     }

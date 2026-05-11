@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class PatientController {
     private final MedicalRecordRepository medicalRecordRepository;
     private final PrescriptionRepository prescriptionRepository;
     private final PrescriptionDetailRepository prescriptionDetailRepository;
+    private final LabTestResultRepository labTestResultRepository;
 
     @GetMapping("/medical-history")
     public String medicalHistory(HttpSession session, Model model) {
@@ -53,7 +55,9 @@ public class PatientController {
         if (username != null) {
             User user = userRepository.findByUsername(username);
             session.setAttribute("loginUser", user);
-            model.addAttribute("appointments", appointmentRepository.findByPatient(user));
+            model.addAttribute("appointments", appointmentRepository.findByPatientAndStatusNot(user, Status.CANCELLED)
+                    .stream().filter(appointment -> appointment.getPatient().isActive()).toList());
+            model.addAttribute("now", LocalDateTime.now());
         }
         return "patient/home";
     }
@@ -75,6 +79,7 @@ public class PatientController {
 
         model.addAttribute("appointment", appointment);
         model.addAttribute("record", record);
+        model.addAttribute("labTestResults", labTestResultRepository.findByMedicalRecord(record));
         return "patient/medical-record-detail";
     }
 
@@ -110,7 +115,8 @@ public class PatientController {
             return "patient/book-appointment";
         }
 
-        if (appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTime(doctor, dto.getAppointmentDate(), dto.getAppointmentTime())) {
+        if (appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTimeAndStatusIn(doctor,
+                dto.getAppointmentDate(), dto.getAppointmentTime(), List.of(Status.PENDING, Status.CONFIRMED))) {
             result.rejectValue("appointmentTime", "error.duplicate", "Bác sĩ đã có lịch hẹn vào khung giờ này. Vui lòng chọn khung giờ khác.");
             model.addAttribute("specialties", specialtyRepository.findAll());
             return "patient/book-appointment";
@@ -145,9 +151,15 @@ public class PatientController {
         }
 
         if (appointment.getStatus() == Status.PENDING || appointment.getStatus() == Status.CONFIRMED) {
+            LocalDateTime appointmentDateTime = appointment.getAppointmentDate().atTime(appointment.getAppointmentTime());
+            if (!LocalDateTime.now().isBefore(appointmentDateTime.minusHours(12))) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Không thể hủy lịch hẹn trong vòng 12 tiếng trước giờ khám.");
+                return "redirect:/patient/home";
+            }
+
             appointment.setStatus(Status.CANCELLED);
             appointmentRepository.save(appointment);
-            redirectAttributes.addFlashAttribute("successMessage", "Đã hủy lịch hẹn thành công!");
+            redirectAttributes.addFlashAttribute("successMessage", "Đã hủy lịch hẹn thành công! Khung giờ của bác sĩ đã được mở lại để bệnh nhân khác có thể đặt lịch.");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Lịch hẹn này không thể hủy.");
         }

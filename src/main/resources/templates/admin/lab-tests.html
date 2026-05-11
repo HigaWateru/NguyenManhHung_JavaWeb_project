@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Quản lý loại xét nghiệm')}"></head>
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="main-content container-fluid">
+        <div class="row">
+            <div class="col-md-3 col-lg-2 px-0">
+                <div th:replace="~{fragments/layout :: sidebar('lab-tests')}"></div>
+            </div>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <div>
+                        <h1 class="h2 fw-bold mb-1">Quản lý loại xét nghiệm</h1>
+                        <p class="text-muted mb-0">Thêm, sửa và theo dõi các xét nghiệm phòng khám đang cung cấp.</p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="mb-0 fw-bold">Thêm loại xét nghiệm</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/admin/lab-tests/add}" th:object="${labTestType}" method="post">
+                                    <div class="mb-3">
+                                        <label class="form-label">Tên xét nghiệm</label>
+                                        <input type="text" th:field="*{name}" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Giá tham khảo</label>
+                                        <input type="number" min="0" step="1000" th:field="*{price}" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Mô tả</label>
+                                        <textarea th:field="*{description}" class="form-control" rows="4"></textarea>
+                                    </div>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" th:field="*{active}">
+                                        <label class="form-check-label">Đang áp dụng</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus me-1"></i> Thêm mới
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="mb-0 fw-bold">Danh sách loại xét nghiệm</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="ps-4">Tên xét nghiệm</th>
+                                                <th>Giá</th>
+                                                <th>Trạng thái</th>
+                                                <th class="text-end pe-4">Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="item : ${labTestTypes}">
+                                                <td class="ps-4">
+                                                    <div class="fw-bold" th:text="${item.name}">Xét nghiệm máu</div>
+                                                    <small class="text-muted" th:text="${item.description != null and item.description != '' ? item.description : 'Chưa có mô tả'}">Mô tả</small>
+                                                </td>
+                                                <td th:text="${item.price != null ? #numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') + ' đ' : 'Chưa cập nhật'}">120,000 đ</td>
+                                                <td>
+                                                    <span class="badge" th:classappend="${item.active ? 'bg-success' : 'bg-secondary'}" th:text="${item.active ? 'Đang áp dụng' : 'Tạm ngưng'}">Đang áp dụng</span>
+                                                </td>
+                                                <td class="text-end pe-4">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" th:data-bs-target="${'#editLabTest' + item.id}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteLabTestModal"
+                                                            th:data-delete-url="@{/admin/lab-tests/delete/{id}(id=${item.id})}"
+                                                            th:data-lab-test-name="${item.name}">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+
+                                                    <div class="modal fade text-start" th:id="${'editLabTest' + item.id}" tabindex="-1" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <form th:action="@{/admin/lab-tests/edit/{id}(id=${item.id})}" method="post">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">Cập nhật loại xét nghiệm</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Tên xét nghiệm</label>
+                                                                            <input type="text" name="name" class="form-control" th:value="${item.name}" required>
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Giá tham khảo</label>
+                                                                            <input type="number" min="0" step="1000" name="price" class="form-control" th:value="${item.price}" required>
+                                                                        </div>
+                                                                        <div class="mb-3">
+                                                                            <label class="form-label">Mô tả</label>
+                                                                            <textarea name="description" class="form-control" rows="4" th:text="${item.description}"></textarea>
+                                                                        </div>
+                                                                        <div class="form-check form-switch">
+                                                                            <input class="form-check-input" type="checkbox" name="active" value="true" th:checked="${item.active}">
+                                                                            <label class="form-check-label">Đang áp dụng</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                                        <button type="submit" class="btn btn-primary">Lưu</button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr th:if="${#lists.isEmpty(labTestTypes)}">
+                                                <td colspan="4" class="text-center py-5 text-muted">Chưa có loại xét nghiệm nào.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteLabTestModal" tabindex="-1" aria-labelledby="deleteLabTestModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deleteLabTestForm" method="get">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteLabTestModalLabel">Xác nhận tạm ngưng loại xét nghiệm</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn tạm ngưng loại xét nghiệm <strong id="deleteLabTestName"></strong> không?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Xác nhận tạm ngưng</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script>
+        const deleteLabTestModal = document.getElementById('deleteLabTestModal');
+        deleteLabTestModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            document.getElementById('deleteLabTestForm').setAttribute('action', button.getAttribute('data-delete-url'));
+            document.getElementById('deleteLabTestName').textContent = button.getAttribute('data-lab-test-name');
+        });
+    </script>
+</body>
+</html>

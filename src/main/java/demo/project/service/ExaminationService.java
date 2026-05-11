@@ -16,6 +16,8 @@ public class ExaminationService {
     private final PrescriptionRepository prescriptionRepository;
     private final PrescriptionDetailRepository prescriptionDetailRepository;
     private final MedicineRepository medicineRepository;
+    private final LabTestTypeRepository labTestTypeRepository;
+    private final LabTestResultRepository labTestResultRepository;
 
     @Transactional
     public void saveExaminationResult(Long appointmentId, ExaminationDto dto) {
@@ -41,6 +43,23 @@ public class ExaminationService {
                     PrescriptionDetail detail = PrescriptionDetail.builder().prescription(prescription)
                             .medicine(medicine).quantity(item.getQuantity()).dosage(item.getDosage()).build();
                     prescriptionDetailRepository.save(detail);
+                }
+            }
+        }
+
+        if (dto.getLabTests() != null && !dto.getLabTests().isEmpty()) {
+            for (ExaminationDto.LabTestItem item : dto.getLabTests()) {
+                if (item.getLabTestTypeId() != null) {
+                    LabTestType labTestType = labTestTypeRepository.findById(item.getLabTestTypeId())
+                            .orElseThrow(() -> new RuntimeException("Lab test type not found"));
+
+                    LabTestResult labTestResult = LabTestResult.builder()
+                            .medicalRecord(record)
+                            .labTestType(labTestType)
+                            .result(item.getResult())
+                            .note(item.getNote())
+                            .build();
+                    labTestResultRepository.save(labTestResult);
                 }
             }
         }

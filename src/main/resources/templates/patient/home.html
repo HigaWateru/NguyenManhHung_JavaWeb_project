@@ -98,10 +98,11 @@
                                         <span th:if="${app.status.name() == 'CANCELLED'}" class="badge bg-danger">Đã hủy</span>
                                         <span th:if="${app.status.name() == 'COMPLETED'}" class="badge bg-info">Hoàn thành</span>
                                     </td>
-                                    <td class="text-end pe-4">
+                                    <td class="text-end pe-4"
+                                        th:with="canCancel=${(app.status.name() == 'PENDING' or app.status.name() == 'CONFIRMED') and app.appointmentDate.atTime(app.appointmentTime).minusHours(12).isAfter(now)}">
                                         <button type="button"
                                                 class="btn btn-sm btn-outline-danger"
-                                                th:if="${app.status.name() == 'PENDING'}"
+                                                th:if="${app.status.name() == 'PENDING' and canCancel}"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#confirmModal"
                                                 th:data-cancel-url="@{/patient/appointments/{id}/cancel(id=${app.id})}">
@@ -112,12 +113,16 @@
                                            class="btn btn-sm btn-info text-white"><i class="fas fa-file-medical me-1"></i>Hồ sơ</a>
                                         <button type="button"
                                                 class="btn btn-sm btn-outline-secondary"
-                                                th:if="${app.status.name() == 'CONFIRMED'}"
+                                                th:if="${app.status.name() == 'CONFIRMED' and canCancel}"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#confirmModal"
                                                 th:data-cancel-url="@{/patient/appointments/{id}/cancel(id=${app.id})}">
                                             Hủy
                                         </button>
+                                        <div th:if="${(app.status.name() == 'PENDING' or app.status.name() == 'CONFIRMED') and !canCancel}"
+                                             class="small text-muted">
+                                            Không thể hủy trong vòng 12 tiếng trước giờ khám.
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr th:if="${#lists.isEmpty(appointments)}">
@@ -142,7 +147,8 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Bạn có chắc chắn muốn hủy lịch hẹn này không?
+                        <p class="mb-2">Bạn có chắc chắn muốn hủy lịch hẹn này không?</p>
+                        <p class="mb-0 small text-muted">Lưu ý: Không được hủy hoặc xóa lịch hẹn trong vòng 12 tiếng trước giờ khám. Sau khi hủy, khung giờ của bác sĩ sẽ được mở lại để bệnh nhân khác có thể đặt lịch.</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>

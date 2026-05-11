@@ -74,6 +74,36 @@
                             <p class="mb-0 text-muted small">Không có đơn thuốc đi kèm.</p>
                         </div>
 
+                        <!-- Lab Test Section -->
+                        <div class="mb-4" th:if="${labTestResults != null && !labTestResults.isEmpty()}">
+                            <h6 class="text-uppercase text-primary small fw-bold mb-3"><i class="fas fa-vial me-2"></i>Kết quả xét nghiệm</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Loại xét nghiệm</th>
+                                            <th>Kết quả</th>
+                                            <th>Ghi chú</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="labTest : ${labTestResults}">
+                                            <td>
+                                                <div class="fw-bold" th:text="${labTest.labTestType.name}">Xét nghiệm máu</div>
+                                                <small class="text-muted" th:if="${labTest.labTestType.price != null}"
+                                                       th:text="${#numbers.formatDecimal(labTest.labTestType.price, 0, 'COMMA', 0, 'POINT') + ' đ'}">120,000 đ</small>
+                                            </td>
+                                            <td th:text="${labTest.result}">Kết quả</td>
+                                            <td th:text="${labTest.note != null and labTest.note != '' ? labTest.note : 'Không có'}">Ghi chú</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div th:unless="${labTestResults != null && !labTestResults.isEmpty()}" class="text-center py-4 bg-light rounded-3 mb-4">
+                            <p class="mb-0 text-muted small">Không có xét nghiệm đi kèm.</p>
+                        </div>
+
                         <!-- Footer Note -->
                         <div class="mt-5 pt-4 border-top text-center text-muted small">
                             <p class="mb-0">Hồ sơ này được trích xuất từ hệ thống quản lý phòng khám trực tuyến.</p>
@@ -85,6 +115,6 @@
         </div>
     </div>
 
-    <footer th:replace="~{fragments/layout :: footer}" style="position: fixed; bottom: 0"></footer>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

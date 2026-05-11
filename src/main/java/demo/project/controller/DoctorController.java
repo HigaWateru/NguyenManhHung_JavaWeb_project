@@ -7,6 +7,7 @@ import demo.project.model.Doctor;
 import demo.project.model.User;
 import demo.project.repository.AppointmentRepository;
 import demo.project.repository.DoctorRepository;
+import demo.project.repository.LabTestTypeRepository;
 import demo.project.repository.MedicineRepository;
 import demo.project.repository.UserRepository;
 import demo.project.service.ExaminationService;
@@ -27,6 +28,7 @@ public class DoctorController {
     private final AppointmentRepository appointmentRepository;
     private final DoctorRepository doctorRepository;
     private final MedicineRepository medicineRepository;
+    private final LabTestTypeRepository labTestTypeRepository;
     private final ExaminationService examinationService;
 
     @GetMapping("/dashboard")
@@ -37,13 +39,13 @@ public class DoctorController {
             session.setAttribute("loginUser", user);
             Doctor doctor = doctorRepository.findByUser(user);
             if (doctor != null) {
-                List<Appointment> appointments = appointmentRepository.findByDoctor(doctor);
+                List<Appointment> appointments = appointmentRepository.findByDoctorAndStatusNot(doctor, Status.CANCELLED);
                 model.addAttribute("appointments", appointments);
                 
-                // Thống kê
+                // appointment counts
                 long pendingCount = appointmentRepository.countByDoctorAndStatus(doctor, Status.PENDING);
                 long completedCount = appointmentRepository.countByDoctorAndStatus(doctor, Status.COMPLETED);
-                long totalCount = appointmentRepository.countByDoctor(doctor);
+                long totalCount = appointmentRepository.countByDoctorAndStatusNot(doctor, Status.CANCELLED);
                 
                 model.addAttribute("pendingCount", pendingCount);
                 model.addAttribute("completedCount", completedCount);
@@ -75,6 +77,7 @@ public class DoctorController {
         model.addAttribute("appointment", appointment);
         model.addAttribute("examinationDto", new ExaminationDto());
         model.addAttribute("medicines", medicineRepository.findAll());
+        model.addAttribute("labTestTypes", labTestTypeRepository.findByActiveTrue());
         return "doctor/examine";
     }
 

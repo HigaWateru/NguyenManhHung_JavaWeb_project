@@ -67,6 +67,33 @@
                                     </div>
                                 </div>
 
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <label class="form-label fw-bold mb-0">Xét nghiệm (Tùy chọn)</label>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addLabTestRow()">
+                                            <i class="fas fa-plus me-1"></i>Thêm xét nghiệm
+                                        </button>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered align-middle" id="labTestTable">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="width: 30%">Loại xét nghiệm</th>
+                                                    <th style="width: 35%">Kết quả</th>
+                                                    <th style="width: 25%">Ghi chú</th>
+                                                    <th style="width: 10%"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="labTestList">
+                                                <!-- Rows will be added here -->
+                                            </tbody>
+                                        </table>
+                                        <div id="noLabTestMsg" class="text-center py-3 text-muted border rounded-3 bg-light">
+                                            Chưa có xét nghiệm nào được chỉ định.
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-12 mt-5">
                                     <hr>
                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -85,7 +112,9 @@
 
     <script th:inline="javascript">
         let rowIdx = 0;
+        let labTestRowIdx = 0;
         const medicines = [[${medicines}]];
+        const labTestTypes = [[${labTestTypes}]];
 
         function addMedicineRow() {
             document.getElementById('noMedicineMsg').classList.add('d-none');
@@ -125,8 +154,48 @@
                 document.getElementById('noMedicineMsg').classList.remove('d-none');
             }
         }
+
+        function addLabTestRow() {
+            document.getElementById('noLabTestMsg').classList.add('d-none');
+            const tbody = document.getElementById('labTestList');
+            const row = document.createElement('tr');
+
+            let options = '<option value="">-- Chọn xét nghiệm --</option>';
+            labTestTypes.forEach(t => {
+                const price = t.price ? ` - ${Number(t.price).toLocaleString('vi-VN')} đ` : '';
+                options += `<option value="${t.id}">${t.name}${price}</option>`;
+            });
+
+            row.innerHTML = `
+                <td>
+                    <select class="form-select form-select-sm" name="labTests[${labTestRowIdx}].labTestTypeId" required>
+                        ${options}
+                    </select>
+                </td>
+                <td>
+                    <textarea class="form-control form-control-sm" name="labTests[${labTestRowIdx}].result" rows="2" placeholder="Ví dụ: Glucose 5.4 mmol/L" required></textarea>
+                </td>
+                <td>
+                    <textarea class="form-control form-control-sm" name="labTests[${labTestRowIdx}].note" rows="2" placeholder="Nhận xét thêm"></textarea>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-link text-danger p-0" onclick="removeLabTestRow(this)">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+            labTestRowIdx++;
+        }
+
+        function removeLabTestRow(btn) {
+            btn.closest('tr').remove();
+            if (document.getElementById('labTestList').children.length === 0) {
+                document.getElementById('noLabTestMsg').classList.remove('d-none');
+            }
+        }
     </script>
 
-    <footer th:replace="~{fragments/layout :: footer}" style="position: fixed; bottom: 0"></footer>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

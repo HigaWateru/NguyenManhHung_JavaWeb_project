@@ -24,7 +24,6 @@
                     <div class="card-body p-4">
                         <form th:action="@{/admin/doctors/add}" th:object="${doctorForm}" method="post">
                             <div class="row g-3">
-                                <!-- Thông tin tài khoản -->
                                 <div class="col-12 border-bottom pb-2 mb-2">
                                     <h5 class="fw-bold text-primary mb-0"><i class="fas fa-user-circle me-2"></i>Thông tin tài khoản</h5>
                                 </div>
@@ -39,7 +38,6 @@
                                     <div class="text-danger small mt-1" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                                 </div>
 
-                                <!-- Thông tin cá nhân -->
                                 <div class="col-12 border-bottom pb-2 mb-2 mt-4">
                                     <h5 class="fw-bold text-primary mb-0"><i class="fas fa-address-card me-2"></i>Thông tin cá nhân</h5>
                                 </div>
@@ -57,7 +55,6 @@
                                     <input type="text" class="form-control" id="address" th:field="*{address}" placeholder="VD: 123 Đường Láng, Hà Nội">
                                 </div>
 
-                                <!-- Thông tin chuyên môn -->
                                 <div class="col-12 border-bottom pb-2 mb-2 mt-4">
                                     <h5 class="fw-bold text-primary mb-0"><i class="fas fa-user-md me-2"></i>Thông tin chuyên môn</h5>
                                 </div>

@@ -3,6 +3,7 @@ package demo.project.running;
 import demo.project.model.*;
 import demo.project.model._enum.Role;
 import demo.project.repository.DoctorRepository;
+import demo.project.repository.LabTestTypeRepository;
 import demo.project.repository.MedicineRepository;
 import demo.project.repository.ProfileRepository;
 import demo.project.repository.SpecialtyRepository;
@@ -22,6 +23,7 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final SpecialtyRepository specialtyRepository;
     private final MedicineRepository medicineRepository;
+    private final LabTestTypeRepository labTestTypeRepository;
     private final DoctorRepository doctorRepository;
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
@@ -30,6 +32,7 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         initializeSpecialties();
         initializeMedicines();
+        initializeLabTestTypes();
         initializeUsers();
     }
 
@@ -63,6 +66,31 @@ public class DataInitializer implements CommandLineRunner {
     private Medicine createMedicine(String name, Integer stock, Double price, String unit) {
         Medicine m = Medicine.builder().name(name).stock(stock).price(price).unit(unit).build();
         return m;
+    }
+
+    private void initializeLabTestTypes() {
+        if (labTestTypeRepository.count() == 0) {
+            List<LabTestType> labTestTypes = Arrays.asList(
+                    createLabTestType("Xét nghiệm công thức máu", "Đánh giá hồng cầu, bạch cầu, tiểu cầu và các chỉ số huyết học cơ bản.", 120000.0),
+                    createLabTestType("Xét nghiệm đường huyết", "Đo nồng độ glucose trong máu để hỗ trợ tầm soát và theo dõi đái tháo đường.", 60000.0),
+                    createLabTestType("Xét nghiệm chức năng gan", "Kiểm tra các chỉ số men gan và bilirubin.", 180000.0),
+                    createLabTestType("Xét nghiệm chức năng thận", "Đánh giá creatinine, ure và các chỉ số liên quan đến chức năng thận.", 150000.0),
+                    createLabTestType("Xét nghiệm nước tiểu", "Phân tích các chỉ số cơ bản trong nước tiểu.", 80000.0),
+                    createLabTestType("Xét nghiệm CRP", "Định lượng CRP để hỗ trợ đánh giá tình trạng viêm nhiễm.", 140000.0),
+                    createLabTestType("Xét nghiệm PCR", "Phát hiện vật liệu di truyền của tác nhân gây bệnh.", 450000.0)
+            );
+            labTestTypeRepository.saveAll(labTestTypes);
+            System.out.println("Đã khởi tạo danh mục loại xét nghiệm mẫu.");
+        }
+    }
+
+    private LabTestType createLabTestType(String name, String description, Double price) {
+        return LabTestType.builder()
+                .name(name)
+                .description(description)
+                .price(price)
+                .active(true)
+                .build();
     }
 
     private void initializeUsers() {

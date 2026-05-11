@@ -126,6 +126,7 @@
                                         <td th:text="${app.doctor.specialty != null ? app.doctor.specialty.name : 'Chưa cập nhật'}">Nội khoa</td>
                                         <td>
                                             <span th:if="${app.status.name() == 'PENDING'}" class="badge bg-secondary">Chờ khám</span>
+                                            <span th:if="${app.status.name() == 'AWAITING_APPROVAL'}" class="badge bg-warning text-dark">Chờ duyệt đơn</span>
                                             <span th:if="${app.status.name() == 'PENDING_PAYMENT'}" class="badge bg-warning text-dark">Chờ thanh toán</span>
                                             <span th:if="${app.status.name() == 'CONFIRMED'}" class="badge bg-primary">Đã xác nhận</span>
                                             <span th:if="${app.status.name() == 'COMPLETED'}" class="badge bg-info">Hoàn thành</span>
@@ -141,17 +142,18 @@
                                             <span th:if="${prescriptionStatuses[app.id] == null}" class="badge bg-light text-dark">Chưa có</span>
                                         </td>
                                         <td>
-                                            <span th:if="${app.status == T(demo.project.model._enum.Status).PENDING_PAYMENT}" class="badge bg-warning text-dark">Chưa thanh toán</span>
-                                            <span th:if="${app.status == T(demo.project.model._enum.Status).PENDING} or ${app.status == T(demo.project.model._enum.Status).CONFIRMED}" class="badge bg-secondary">Chưa cần thanh toán</span>
+                                            <span th:if="${paidPayments[app.id]}" class="badge bg-success">Đã thanh toán</span>
+                                            <span th:if="${!paidPayments[app.id] and app.status == T(demo.project.model._enum.Status).PENDING_PAYMENT and unpaidPayments[app.id]}" class="badge bg-warning text-dark">Chưa thanh toán</span>
+                                            <span th:if="${!paidPayments[app.id] and app.status == T(demo.project.model._enum.Status).AWAITING_APPROVAL}" class="badge bg-secondary">Chờ duyệt đơn</span>
+                                            <span th:if="${!paidPayments[app.id] and (app.status == T(demo.project.model._enum.Status).PENDING or app.status == T(demo.project.model._enum.Status).CONFIRMED)}" class="badge bg-secondary">Chưa cần thanh toán</span>
                                             <span th:if="${app.status == T(demo.project.model._enum.Status).COMPLETED}">
-                                                <span th:if="${paidPayments[app.id]}" class="badge bg-success">Đã thanh toán</span>
                                                 <span th:unless="${paidPayments[app.id]}" class="badge bg-secondary">Đã khám</span>
                                             </span>
                                             <span th:if="${app.status == T(demo.project.model._enum.Status).CANCELLED}" class="badge bg-danger">Không áp dụng</span>
                                         </td>
                                         <td class="text-end pe-4"
                                             th:with="canCancel=${(app.status.name() == 'PENDING' or app.status.name() == 'CONFIRMED') and app.appointmentDate.atTime(app.appointmentTime).minusHours(12).isAfter(now)}">
-                                            <a th:if="${app.status.name() == 'PENDING_PAYMENT'}"
+                                            <a th:if="${app.status.name() == 'PENDING_PAYMENT' and unpaidPayments[app.id] and !paidPayments[app.id]}"
                                            th:href="@{/patient/appointments/{id}/payment(id=${app.id})}"
                                            class="btn btn-sm btn-outline-primary ms-1">
                                             <i class="fas fa-credit-card me-1"></i> Thanh toán

@@ -2,8 +2,10 @@ package demo.project.controller;
 
 import demo.project.dto.LoginDto;
 import demo.project.dto.RegisterDto;
+import demo.project.model.Profile;
 import demo.project.model.User;
 import demo.project.model._enum.Role;
+import demo.project.repository.ProfileRepository;
 import demo.project.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class UserController {
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping({"/", "/home"})
@@ -103,6 +106,11 @@ public class UserController {
                 role(Role.PATIENT).isActive(true).build();
 
         userRepository.save(user);
+        Profile profile = Profile.builder()
+                .user(user)
+                .fullName(dto.getUsername())
+                .build();
+        profileRepository.save(profile);
         return "redirect:/login";
     }
 }

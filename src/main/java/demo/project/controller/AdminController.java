@@ -10,12 +10,14 @@ import demo.project.model.PrescriptionDetail;
 import demo.project.model.Profile;
 import demo.project.model.Specialty;
 import demo.project.model.User;
+import demo.project.model._enum.PaymentStatus;
 import demo.project.model._enum.Role;
 import demo.project.model._enum.Status;
 import demo.project.repository.AppointmentRepository;
 import demo.project.repository.DoctorRepository;
 import demo.project.repository.LabTestTypeRepository;
 import demo.project.repository.MedicineRepository;
+import demo.project.repository.PaymentRepository;
 import demo.project.repository.PrescriptionDetailRepository;
 import demo.project.repository.PrescriptionRepository;
 import demo.project.repository.ProfileRepository;
@@ -47,6 +49,7 @@ public class AdminController {
     private final PrescriptionRepository prescriptionRepository;
     private final PrescriptionDetailRepository prescriptionDetailRepository;
     private final AppointmentRepository appointmentRepository;
+    private final PaymentRepository paymentRepository;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/dashboard")
@@ -231,7 +234,8 @@ public class AdminController {
 
         Appointment appointment = prescription.getMedicalRecord().getAppointment();
         if (appointment != null) {
-            appointment.setStatus(Status.PENDING_PAYMENT);
+            boolean hasUnpaidPayment = paymentRepository.existsByAppointmentAndStatus(appointment, PaymentStatus.UNPAID);
+            appointment.setStatus(hasUnpaidPayment ? Status.PENDING_PAYMENT : Status.COMPLETED);
             appointmentRepository.save(appointment);
         }
 

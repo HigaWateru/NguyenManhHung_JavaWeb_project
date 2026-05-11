@@ -63,10 +63,13 @@ public class PatientController {
                     .stream().filter(appointment -> appointment.getPatient().isActive()).toList();
             model.addAttribute("appointments", appointments);
             Map<Long, Boolean> paidPayments = new HashMap<>();
+            Map<Long, Boolean> unpaidPayments = new HashMap<>();
             Map<Long, String> prescriptionStatuses = new HashMap<>();
             for (Appointment appointment : appointments) {
                 paidPayments.put(appointment.getId(),
                         paymentRepository.existsByAppointmentAndStatus(appointment, PaymentStatus.PAID));
+                unpaidPayments.put(appointment.getId(),
+                        paymentRepository.existsByAppointmentAndStatus(appointment, PaymentStatus.UNPAID));
 
                 MedicalRecord record = medicalRecordRepository.findByAppointment(appointment).orElse(null);
                 if (record == null) {
@@ -89,13 +92,17 @@ public class PatientController {
                 }
             }
             model.addAttribute("paidPayments", paidPayments);
+            model.addAttribute("unpaidPayments", unpaidPayments);
             model.addAttribute("prescriptionStatuses", prescriptionStatuses);
             model.addAttribute("pendingCount", appointments.stream()
                     .filter(appointment -> appointment.getStatus() == Status.PENDING).count());
             model.addAttribute("pendingPaymentCount", appointments.stream()
-                    .filter(appointment -> appointment.getStatus() == Status.PENDING_PAYMENT).count());
+                    .filter(appointment -> appointment.getStatus() == Status.PENDING_PAYMENT
+                            && paymentRepository.existsByAppointmentAndStatus(appointment, PaymentStatus.UNPAID)).count());
             model.addAttribute("confirmedCount", appointments.stream()
                     .filter(appointment -> appointment.getStatus() == Status.CONFIRMED).count());
+            model.addAttribute("awaitingApprovalCount", appointments.stream()
+                    .filter(appointment -> appointment.getStatus() == Status.AWAITING_APPROVAL).count());
             model.addAttribute("completedCount", appointments.stream()
                     .filter(appointment -> appointment.getStatus() == Status.COMPLETED).count());
             model.addAttribute("now", LocalDateTime.now());
@@ -157,7 +164,8 @@ public class PatientController {
         }
 
         if (appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTimeAndStatusIn(doctor,
-                dto.getAppointmentDate(), dto.getAppointmentTime(), List.of(Status.PENDING_PAYMENT, Status.PENDING, Status.CONFIRMED))) {
+                dto.getAppointmentDate(), dto.getAppointmentTime(), List.of(Status.PENDING_PAYMENT, Status.PENDING,
+                        Status.CONFIRMED, Status.AWAITING_APPROVAL))) {
             result.rejectValue("appointmentTime", "error.duplicate", "Bác sĩ đã có lịch hẹn vào khung giờ này. Vui lòng chọn khung giờ khác.");
             model.addAttribute("specialties", specialtyRepository.findAll());
             return "patient/book-appointment";
@@ -246,11 +254,17 @@ public class PatientController {
             return "redirect:/patient/home";
         }
 
-        unpaidPayment.setProvider(provider);
-        unpaidPayment.setStatus(PaymentStatus.PAID);
-        unpaidPayment.setPaidAt(LocalDateTime.now());
-        unpaidPayment.setTransactionCode(provider + "-" + appointment.getId() + "-" + System.currentTimeMillis());
-        paymentRepository.save(unpaidPayment);
+        LocalDateTime paidAt = LocalDateTime.now();
+        String transactionCode = provider + "-" + appointment.getId() + "-" + System.currentTimeMillis();
+        paymentRepository.findByAppointment(appointment).stream()
+                .filter(payment -> payment.getStatus() == PaymentStatus.UNPAID)
+                .forEach(payment -> {
+                    payment.setProvider(provider);
+                    payment.setStatus(PaymentStatus.PAID);
+                    payment.setPaidAt(paidAt);
+                    payment.setTransactionCode(transactionCode);
+                    paymentRepository.save(payment);
+                });
 
         appointment.setStatus(Status.COMPLETED);
         appointmentRepository.save(appointment);

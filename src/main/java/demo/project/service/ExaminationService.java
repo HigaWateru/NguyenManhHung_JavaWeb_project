@@ -90,7 +90,7 @@ public class ExaminationService {
                     .transactionCode("INVOICE-" + appointment.getId() + "-" + System.currentTimeMillis())
                     .status(PaymentStatus.UNPAID).build();
             paymentRepository.save(payment);
-            appointment.setStatus(Status.PENDING_PAYMENT);
+            appointment.setStatus(hasMedicine ? Status.AWAITING_APPROVAL : Status.PENDING_PAYMENT);
         } else {
             appointment.setStatus(Status.COMPLETED);
         }

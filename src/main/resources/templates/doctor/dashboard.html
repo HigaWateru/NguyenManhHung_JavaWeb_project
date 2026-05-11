@@ -25,7 +25,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="text-muted small text-uppercase">Chờ khám</h6>
+                                        <h6 class="text-muted small text-uppercase">Chờ xử lý</h6>
                                         <h3 class="fw-bold mb-0 text-primary" th:text="${#numbers.formatInteger(pendingCount, 2)}">05</h3>
                                     </div>
                                     <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
@@ -95,11 +95,11 @@
                                         </td>
                                         <td>Lịch khám sức khỏe</td>
                                         <td>
-                                            <span class="badge" th:classappend="${appointment.status == T(demo.project.model._enum.Status).PENDING ? 'bg-primary' : (appointment.status == T(demo.project.model._enum.Status).COMPLETED ? 'bg-success' : 'bg-secondary')}" 
+                                            <span class="badge" th:classappend="${appointment.status == T(demo.project.model._enum.Status).CONFIRMED ? 'bg-primary' : (appointment.status == T(demo.project.model._enum.Status).COMPLETED ? 'bg-success' : 'bg-secondary')}" 
                                                   th:text="${appointment.status}">PENDING</span>
                                         </td>
                                         <td class="text-end pe-4">
-                                            <a th:if="${appointment.status == T(demo.project.model._enum.Status).PENDING}" 
+                                            <a th:if="${appointment.status == T(demo.project.model._enum.Status).CONFIRMED or appointment.status == T(demo.project.model._enum.Status).PENDING}" 
                                                th:href="@{/doctor/examine/{id}(id=${appointment.id})}" 
                                                class="btn btn-sm btn-success px-3">Bắt đầu khám <i class="fas fa-arrow-right ms-1"></i></a>
                                             <span th:if="${appointment.status == T(demo.project.model._enum.Status).COMPLETED}" class="text-success small"><i class="fas fa-check-circle"></i> Đã xong</span>

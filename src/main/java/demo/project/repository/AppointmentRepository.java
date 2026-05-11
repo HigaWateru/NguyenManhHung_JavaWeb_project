@@ -16,6 +16,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByDoctor(Doctor doctor);
     List<Appointment> findByDoctorAndStatusNot(Doctor doctor, Status status);
     List<Appointment> findByDoctorAndStatus(Doctor doctor, demo.project.model._enum.Status status);
+    List<Appointment> findByDoctorAndStatusIn(Doctor doctor, List<Status> statuses);
     long countByDoctorAndStatus(Doctor doctor, demo.project.model._enum.Status status);
     long countByDoctor(Doctor doctor);
     long countByDoctorAndStatusNot(Doctor doctor, Status status);

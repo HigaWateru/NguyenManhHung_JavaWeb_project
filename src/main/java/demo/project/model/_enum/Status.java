@@ -1,5 +1,5 @@
 package demo.project.model._enum;
 
 public enum Status {
-    PENDING, CONFIRMED, CANCELLED, COMPLETED
+    PENDING_PAYMENT, PENDING, CONFIRMED, CANCELLED, COMPLETED
 }

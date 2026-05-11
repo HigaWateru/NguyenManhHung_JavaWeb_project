@@ -1,6 +1,7 @@
 package demo.project.controller;
 
 import demo.project.dto.DoctorDto;
+import demo.project.model.Appointment;
 import demo.project.model.Doctor;
 import demo.project.model.LabTestType;
 import demo.project.model.Medicine;
@@ -11,6 +12,7 @@ import demo.project.model.Specialty;
 import demo.project.model.User;
 import demo.project.model._enum.Role;
 import demo.project.model._enum.Status;
+import demo.project.repository.AppointmentRepository;
 import demo.project.repository.DoctorRepository;
 import demo.project.repository.LabTestTypeRepository;
 import demo.project.repository.MedicineRepository;
@@ -44,6 +46,7 @@ public class AdminController {
     private final LabTestTypeRepository labTestTypeRepository;
     private final PrescriptionRepository prescriptionRepository;
     private final PrescriptionDetailRepository prescriptionDetailRepository;
+    private final AppointmentRepository appointmentRepository;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/dashboard")
@@ -225,6 +228,13 @@ public class AdminController {
 
         prescription.setStatus(Status.CONFIRMED);
         prescriptionRepository.save(prescription);
+
+        Appointment appointment = prescription.getMedicalRecord().getAppointment();
+        if (appointment != null) {
+            appointment.setStatus(Status.PENDING_PAYMENT);
+            appointmentRepository.save(appointment);
+        }
+
         redirectAttributes.addFlashAttribute("successMessage", "Duyệt đơn thuốc thành công!");
         return "redirect:/admin/prescriptions";
     }

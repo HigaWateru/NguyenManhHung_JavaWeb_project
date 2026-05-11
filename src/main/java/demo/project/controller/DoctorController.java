@@ -39,13 +39,15 @@ public class DoctorController {
             session.setAttribute("loginUser", user);
             Doctor doctor = doctorRepository.findByUser(user);
             if (doctor != null) {
-                List<Appointment> appointments = appointmentRepository.findByDoctorAndStatusNot(doctor, Status.CANCELLED);
+                List<Appointment> appointments = appointmentRepository.findByDoctorAndStatusIn(doctor,
+                        List.of(Status.CONFIRMED, Status.PENDING_PAYMENT, Status.PENDING, Status.COMPLETED));
                 model.addAttribute("appointments", appointments);
                 
-                // appointment counts
-                long pendingCount = appointmentRepository.countByDoctorAndStatus(doctor, Status.PENDING);
+                long pendingCount = appointmentRepository.countByDoctorAndStatus(doctor, Status.CONFIRMED)
+                        + appointmentRepository.countByDoctorAndStatus(doctor, Status.PENDING_PAYMENT)
+                        + appointmentRepository.countByDoctorAndStatus(doctor, Status.PENDING);
                 long completedCount = appointmentRepository.countByDoctorAndStatus(doctor, Status.COMPLETED);
-                long totalCount = appointmentRepository.countByDoctorAndStatusNot(doctor, Status.CANCELLED);
+                long totalCount = pendingCount + completedCount;
                 
                 model.addAttribute("pendingCount", pendingCount);
                 model.addAttribute("completedCount", completedCount);
@@ -73,6 +75,9 @@ public class DoctorController {
     public String examineForm(@PathVariable Long appointmentId, Model model) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        if (appointment.getStatus() != Status.CONFIRMED && appointment.getStatus() != Status.PENDING) {
+            throw new RuntimeException("Appointment is not ready for examination");
+        }
         
         model.addAttribute("appointment", appointment);
         model.addAttribute("examinationDto", new ExaminationDto());
@@ -83,13 +88,20 @@ public class DoctorController {
 
     @PostMapping("/examine/{appointmentId}")
     public String submitExamination(@PathVariable Long appointmentId, @ModelAttribute ExaminationDto dto,
-                                    RedirectAttributes redirectAttributes) {
+                                    RedirectAttributes redirectAttributes, Model model) {
         try {
             examinationService.saveExaminationResult(appointmentId, dto);
             redirectAttributes.addFlashAttribute("successMessage", "Đã lưu kết quả khám bệnh thành công!");
+            return "redirect:/doctor/dashboard";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+            Appointment appointment = appointmentRepository.findById(appointmentId)
+                    .orElseThrow(() -> new RuntimeException("Appointment not found"));
+            model.addAttribute("appointment", appointment);
+            model.addAttribute("examinationDto", dto);
+            model.addAttribute("medicines", medicineRepository.findAll());
+            model.addAttribute("labTestTypes", labTestTypeRepository.findByActiveTrue());
+            model.addAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+            return "doctor/examine";
         }
-        return "redirect:/doctor/dashboard";
     }
 }

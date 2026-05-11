@@ -17,7 +17,7 @@
                 <div class="card shadow-sm border-0 mb-4 overflow-hidden">
                     <div class="card-header bg-primary text-white py-3 text-center">
                         <h4 class="mb-0 fw-bold">HỒ SƠ KHÁM BỆNH</h4>
-                        <small>Mã hồ sơ: #[[${record.id}]] | Ngày khám: [[${appointment.appointmentDate}]]</small>
+                        <small>Mã hồ sơ: #[[${record.id}]] | Ngày khám: [[${#temporals.format(appointment.appointmentDate, 'dd/MM/yyyy')}]]</small>
                     </div>
                     <div class="card-body p-4 p-md-5">
                         <!-- Info Section -->

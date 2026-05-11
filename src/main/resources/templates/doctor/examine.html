@@ -30,6 +30,10 @@
                         </div>
 
                         <form th:action="@{/doctor/examine/{id}(id=${appointment.id})}" th:object="${examinationDto}" method="post" id="examForm">
+                            <div id="formErrorMessage" class="alert alert-danger alert-dismissible fade show d-none" th:classappend="${errorMessage} != null ? ' d-block' : ''" role="alert">
+                                <span id="formErrorText" th:text="${errorMessage}"></span>
+                                <button type="button" class="btn-close" aria-label="Close" onclick="hideFormError()"></button>
+                            </div>
                             <div class="row g-4">
                                 <div class="col-md-12">
                                     <label class="form-label fw-bold">Chẩn đoán <span class="text-danger">*</span></label>
@@ -194,6 +198,60 @@
                 document.getElementById('noLabTestMsg').classList.remove('d-none');
             }
         }
+
+        function showFormError(message) {
+            const errorBox = document.getElementById('formErrorMessage');
+            const errorText = document.getElementById('formErrorText');
+            if (!errorBox || !errorText) {
+                return;
+            }
+            errorText.textContent = message;
+            errorBox.classList.remove('d-none');
+        }
+
+        function hideFormError() {
+            const errorBox = document.getElementById('formErrorMessage');
+            if (errorBox) {
+                errorBox.classList.add('d-none');
+            }
+        }
+
+        function validateDuplicateSelections(selector, errorMessage) {
+            const selects = document.querySelectorAll(selector);
+            const selectedIds = new Set();
+            for (const select of selects) {
+                const value = select.value;
+                if (!value) {
+                    continue;
+                }
+                if (selectedIds.has(value)) {
+                    showFormError(errorMessage);
+                    return false;
+                }
+                selectedIds.add(value);
+            }
+            return true;
+        }
+
+        function validateDuplicates() {
+            if (!validateDuplicateSelections('#medicineList select[name$=".medicineId"]',
+                    'Không được chọn trùng thuốc trong đơn. Vui lòng chọn mỗi thuốc một lần.')) {
+                return false;
+            }
+            if (!validateDuplicateSelections('#labTestList select[name$=".labTestTypeId"]',
+                    'Không được chọn trùng xét nghiệm trong đơn. Vui lòng chọn mỗi xét nghiệm một lần.')) {
+                return false;
+            }
+            hideFormError();
+            return true;
+        }
+
+        document.getElementById('examForm').addEventListener('submit', function (event) {
+            if (!validateDuplicates()) {
+                event.preventDefault();
+                return false;
+            }
+        });
     </script>
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>

@@ -4,151 +4,204 @@
 <body>
     <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
-    <div class="main-content container mt-4">
-        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <span th:text="${successMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <span th:text="${errorMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-
-        <!-- Hero Section -->
-        <div class="p-5 mb-4 bg-primary text-white rounded-3 shadow">
-            <div class="container-fluid py-5">
-                <h1 class="display-5 fw-bold">Chăm sóc sức khỏe thông minh</h1>
-                <p class="col-md-8 fs-4">Đặt lịch khám nhanh chóng, quản lý hồ sơ bệnh án điện tử và kết nối với các bác sĩ hàng đầu ngay tại nhà.</p>
-                <a th:href="${session.loginUser != null ? '/patient/appointments/book' : '/login'}" class="btn btn-light btn-lg px-4 fw-bold text-primary">Đặt lịch ngay <i class="fas fa-calendar-plus ms-2"></i></a>
+    <div class="main-content container-fluid">
+        <div class="row">
+            <div class="col-md-3 col-lg-2 px-0">
+                <div th:replace="~{fragments/layout :: sidebar('patient-home')}"></div>
             </div>
-        </div>
 
-        <div class="row g-4">
-            <!-- Feature Cards -->
-            <div class="col-md-4">
-                <a th:href="${session.loginUser != null ? '/patient/appointments/book' : '/login'}" class="text-decoration-none text-dark">
-                    <div class="card h-100 text-center p-3 shadow-sm hover-card">
-                        <div class="card-body">
-                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                                <i class="fas fa-calendar-check fa-2x text-primary"></i>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <div>
+                        <h1 class="h2 fw-bold mb-1">Lịch khám của tôi</h1>
+                        <p class="text-muted mb-0">Theo dõi lịch hẹn, thanh toán demo và xem hồ sơ sau khi khám.</p>
+                    </div>
+                    <a th:href="@{/patient/appointments/book}" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus me-1"></i> Đặt lịch mới
+                    </a>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="card border-start border-secondary border-4 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted small text-uppercase mb-1">Chờ khám</h6>
+                                        <h3 class="fw-bold mb-0 text-secondary" th:text="${pendingCount ?: 0}">0</h3>
+                                    </div>
+                                    <div class="bg-secondary bg-opacity-10 p-3 rounded-circle">
+                                        <i class="fas fa-user-clock text-secondary fa-lg"></i>
+                                    </div>
+                                </div>
                             </div>
-                            <h5 class="card-title fw-bold">Đặt lịch khám</h5>
-                            <p class="card-text text-muted">Chủ động chọn bác sĩ và thời gian khám phù hợp với lịch trình của bạn.</p>
                         </div>
                     </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a th:href="@{/patient/medical-history}" class="text-decoration-none text-dark">
-                    <div class="card h-100 text-center p-3 shadow-sm hover-card">
-                        <div class="card-body">
-                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                                <i class="fas fa-file-medical fa-2x text-success"></i>
+                    <div class="col-md-3">
+                        <div class="card border-start border-warning border-4 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted small text-uppercase mb-1">Chờ thanh toán</h6>
+                                        <h3 class="fw-bold mb-0 text-warning" th:text="${pendingPaymentCount ?: 0}">0</h3>
+                                    </div>
+                                    <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
+                                        <i class="fas fa-credit-card text-warning fa-lg"></i>
+                                    </div>
+                                </div>
                             </div>
-                            <h5 class="card-title fw-bold">Hồ sơ bệnh án</h5>
-                            <p class="card-text text-muted">Xem lại lịch sử khám bệnh, kết quả chẩn đoán và đơn thuốc bất cứ lúc nào.</p>
                         </div>
                     </div>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a th:href="@{/profile}" class="text-decoration-none text-dark">
-                    <div class="card h-100 text-center p-3 shadow-sm hover-card">
-                        <div class="card-body">
-                            <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                                <i class="fas fa-user-edit fa-2x text-info"></i>
+                    <div class="col-md-3">
+                        <div class="card border-start border-success border-4 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted small text-uppercase mb-1">Đã xác nhận</h6>
+                                        <h3 class="fw-bold mb-0 text-success" th:text="${confirmedCount ?: 0}">0</h3>
+                                    </div>
+                                    <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                                        <i class="fas fa-circle-check text-success fa-lg"></i>
+                                    </div>
+                                </div>
                             </div>
-                            <h5 class="card-title fw-bold">Hồ sơ cá nhân</h5>
-                            <p class="card-text text-muted">Cập nhật thông tin cá nhân và quản lý tài khoản của bạn.</p>
                         </div>
                     </div>
-                </a>
-            </div>
-        </div>
-
-        <!-- Section for Logged In User -->
-        <div class="mt-5 mb-5" th:if="${session.loginUser != null}">
-            <h3 class="fw-bold mb-4">Lịch hẹn của tôi</h3>
-            <div class="card shadow-sm">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="ps-4">Ngày khám</th>
-                                    <th>Giờ khám</th>
-                                    <th>Bác sĩ</th>
-                                    <th>Chuyên khoa</th>
-                                    <th>Trạng thái</th>
-                                    <th class="text-end pe-4">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="app : ${appointments}">
-                                    <td class="ps-4" th:text="${app.appointmentDate}">01/01/2026</td>
-                                    <td th:text="${app.appointmentTime}">08:00</td>
-                                    <td>
-                                        <span th:if="${app.doctor.user.profile != null}" th:text="${app.doctor.user.profile.fullName}">BS. Nguyễn Văn A</span>
-                                        <span th:if="${app.doctor.user.profile == null}" th:text="${app.doctor.user.username}">doctor</span>
-                                    </td>
-                                    <td th:text="${app.doctor.specialty.name}">Nội khoa</td>
-                                    <td>
-                                        <span th:if="${app.status.name() == 'PENDING'}" class="badge bg-warning text-dark">Chờ xác nhận</span>
-                                        <span th:if="${app.status.name() == 'CONFIRMED'}" class="badge bg-success">Đã xác nhận</span>
-                                        <span th:if="${app.status.name() == 'CANCELLED'}" class="badge bg-danger">Đã hủy</span>
-                                        <span th:if="${app.status.name() == 'COMPLETED'}" class="badge bg-info">Hoàn thành</span>
-                                    </td>
-                                    <td class="text-end pe-4"
-                                        th:with="canCancel=${(app.status.name() == 'PENDING' or app.status.name() == 'CONFIRMED') and app.appointmentDate.atTime(app.appointmentTime).minusHours(12).isAfter(now)}">
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-danger"
-                                                th:if="${app.status.name() == 'PENDING' and canCancel}"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#confirmModal"
-                                                th:data-cancel-url="@{/patient/appointments/{id}/cancel(id=${app.id})}">
-                                            Hủy
-                                        </button>
-                                        <a th:if="${app.status.name() == 'COMPLETED'}" 
-                                           th:href="@{/patient/medical-record/{id}(id=${app.id})}" 
-                                           class="btn btn-sm btn-info text-white"><i class="fas fa-file-medical me-1"></i>Hồ sơ</a>
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-secondary"
-                                                th:if="${app.status.name() == 'CONFIRMED' and canCancel}"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#confirmModal"
-                                                th:data-cancel-url="@{/patient/appointments/{id}/cancel(id=${app.id})}">
-                                            Hủy
-                                        </button>
-                                        <div th:if="${(app.status.name() == 'PENDING' or app.status.name() == 'CONFIRMED') and !canCancel}"
-                                             class="small text-muted">
-                                            Không thể hủy trong vòng 12 tiếng trước giờ khám.
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr th:if="${#lists.isEmpty(appointments)}">
-                                    <td colspan="6" class="text-center py-4 text-muted">
-                                        Bạn chưa có lịch hẹn nào. <a th:href="@{/patient/appointments/book}">Đặt lịch ngay!</a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="col-md-3">
+                        <div class="card border-start border-info border-4 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted small text-uppercase mb-1">Đã hoàn thành</h6>
+                                        <h3 class="fw-bold mb-0 text-info" th:text="${completedCount ?: 0}">0</h3>
+                                    </div>
+                                    <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                                        <i class="fas fa-file-medical text-info fa-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">Danh sách lịch hẹn</h5>
+                        <a th:href="@{/patient/medical-history}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-clock-rotate-left me-1"></i> Hồ sơ bệnh án
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">Thời gian</th>
+                                        <th>Bác sĩ</th>
+                                        <th>Chuyên khoa</th>
+                                        <th>Trạng thái lịch</th>
+                                        <th>Đơn thuốc</th>
+                                        <th>Thanh toán</th>
+                                        <th class="text-end pe-4">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="app : ${appointments}">
+                                        <td class="ps-4">
+                                            <div class="fw-bold" th:text="${#temporals.format(app.appointmentDate, 'dd/MM/yyyy')}">2026-05-11</div>
+                                            <small class="text-muted" th:text="${app.appointmentTime}">08:00</small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold" th:text="${app.doctor.user.profile != null and app.doctor.user.profile.fullName != null and app.doctor.user.profile.fullName != '' ? app.doctor.user.profile.fullName : app.doctor.user.username}">BS. Nguyễn Văn A</div>
+                                        </td>
+                                        <td th:text="${app.doctor.specialty != null ? app.doctor.specialty.name : 'Chưa cập nhật'}">Nội khoa</td>
+                                        <td>
+                                            <span th:if="${app.status.name() == 'PENDING'}" class="badge bg-secondary">Chờ khám</span>
+                                            <span th:if="${app.status.name() == 'PENDING_PAYMENT'}" class="badge bg-warning text-dark">Chờ thanh toán</span>
+                                            <span th:if="${app.status.name() == 'CONFIRMED'}" class="badge bg-primary">Đã xác nhận</span>
+                                            <span th:if="${app.status.name() == 'COMPLETED'}" class="badge bg-info">Hoàn thành</span>
+                                            <span th:if="${app.status.name() == 'CANCELLED'}" class="badge bg-danger">Đã hủy</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${prescriptionStatuses[app.id] == 'Chờ duyệt'}" class="badge bg-warning text-dark">Chờ duyệt</span>
+                                            <span th:if="${prescriptionStatuses[app.id] == 'Đã duyệt'}" class="badge bg-primary text-white">Đã duyệt</span>
+                                            <span th:if="${prescriptionStatuses[app.id] == 'Hoàn thành'}" class="badge bg-success">Hoàn thành</span>
+                                            <span th:if="${prescriptionStatuses[app.id] == 'Đã hủy'}" class="badge bg-danger">Đã hủy</span>
+                                            <span th:if="${prescriptionStatuses[app.id] == 'Không kê đơn'}" class="badge bg-secondary">Không kê đơn</span>
+                                            <span th:if="${prescriptionStatuses[app.id] == 'Chưa khám'}" class="badge bg-light text-dark">Chưa khám</span>
+                                            <span th:if="${prescriptionStatuses[app.id] == null}" class="badge bg-light text-dark">Chưa có</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${app.status == T(demo.project.model._enum.Status).PENDING_PAYMENT}" class="badge bg-warning text-dark">Chưa thanh toán</span>
+                                            <span th:if="${app.status == T(demo.project.model._enum.Status).PENDING} or ${app.status == T(demo.project.model._enum.Status).CONFIRMED}" class="badge bg-secondary">Chưa cần thanh toán</span>
+                                            <span th:if="${app.status == T(demo.project.model._enum.Status).COMPLETED}">
+                                                <span th:if="${paidPayments[app.id]}" class="badge bg-success">Đã thanh toán</span>
+                                                <span th:unless="${paidPayments[app.id]}" class="badge bg-secondary">Đã khám</span>
+                                            </span>
+                                            <span th:if="${app.status == T(demo.project.model._enum.Status).CANCELLED}" class="badge bg-danger">Không áp dụng</span>
+                                        </td>
+                                        <td class="text-end pe-4"
+                                            th:with="canCancel=${(app.status.name() == 'PENDING' or app.status.name() == 'CONFIRMED') and app.appointmentDate.atTime(app.appointmentTime).minusHours(12).isAfter(now)}">
+                                            <a th:if="${app.status.name() == 'PENDING_PAYMENT'}"
+                                           th:href="@{/patient/appointments/{id}/payment(id=${app.id})}"
+                                           class="btn btn-sm btn-outline-primary ms-1">
+                                            <i class="fas fa-credit-card me-1"></i> Thanh toán
+                                        </a>
+
+                                            <a th:if="${app.status.name() == 'COMPLETED'}"
+                                               th:href="@{/patient/medical-record/{id}(id=${app.id})}"
+                                               class="btn btn-sm btn-info text-white">
+                                                <i class="fas fa-file-medical me-1"></i> Hồ sơ
+                                            </a>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger ms-1"
+                                                    th:if="${(app.status.name() == 'PENDING' or app.status.name() == 'CONFIRMED') and canCancel}"
+                                                    data-bs-toggle="modal" data-bs-target="#confirmModal"
+                                                    th:data-cancel-url="@{/patient/appointments/{id}/cancel(id=${app.id})}">
+                                                Hủy
+                                            </button>
+
+                                            <div th:if="${(app.status.name() == 'PENDING' or app.status.name() == 'CONFIRMED') and !canCancel}"
+                                                 class="small text-muted">
+                                                Không thể hủy trong vòng 12 tiếng trước giờ khám.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(appointments)}">
+                                        <td colspan="7" class="text-center py-5 text-muted">
+                                            Bạn chưa có lịch hẹn nào. <a th:href="@{/patient/appointments/book}">Đặt lịch ngay</a>.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
 
-    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModal" aria-hidden="true">
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="cancelAppointmentForm" method="post">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Xác nhận hủy lịch hẹn</h5>
+                        <h5 class="modal-title" id="confirmModalLabel">Xác nhận hủy lịch hẹn</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <p class="mb-2">Bạn có chắc chắn muốn hủy lịch hẹn này không?</p>
-                        <p class="mb-0 small text-muted">Lưu ý: Không được hủy hoặc xóa lịch hẹn trong vòng 12 tiếng trước giờ khám. Sau khi hủy, khung giờ của bác sĩ sẽ được mở lại để bệnh nhân khác có thể đặt lịch.</p>
+                        <p class="mb-0 small text-muted">Không được hủy lịch hẹn trong vòng 12 tiếng trước giờ khám.</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -165,8 +218,7 @@
         const confirmModal = document.getElementById('confirmModal');
         confirmModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
-            const cancelUrl = button.getAttribute('data-cancel-url');
-            document.getElementById('cancelAppointmentForm').setAttribute('action', cancelUrl);
+            document.getElementById('cancelAppointmentForm').setAttribute('action', button.getAttribute('data-cancel-url'));
         });
     </script>
 </body>
